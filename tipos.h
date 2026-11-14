@@ -73,7 +73,7 @@ typedef struct {
     int meta;
     int gapMin, gapVar;
     int pctVoador, pctDupla;
-    double distInt;
+    double distIni;
     Modelo mod[3];
 } Fase;
 
