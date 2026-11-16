@@ -3,8 +3,10 @@
 
 #include "tipos.h"
 
-extern const char *const BLK[4];
+/* espaço, meio bloco de cima, meio bloco de baixo, bloco cheio */
+static const char *const BLK[4] = { " ", "\xe2\x96\x80", "\xe2\x96\x84", "\xe2\x96\x88" };
 
-// resto
+/* A pessoa C acrescenta aqui embaixo: sprites, SPR_JOG, PAR_FRAG, PAR_JOIA,
+   NOME_JOGADOR e FASES (tudo static const) */
 
 #endif
