@@ -310,6 +310,92 @@ int colide(const Jogador *p, const Entidade *e)
     int ph = (p->agachado > 0 && p->noChao) ? 7 : 11;    /* altura do jogador */
     return ra < e->alt + e->h && e->alt < ra + ph;       /* vertical */
 }
+
+void criarObstaculo(Jogo *j, const Modelo *m, double x)
+{
+    listaInserir(&j->lista,
+        entidadeNova(OBSTACULO, x, m->alt, m->spr[0]->w, m->spr[0]->h, 2, m->spr));
+}
+
+void criarTrilha(Jogo *j, double x, int alt, int qtd)
+{
+    for (int i = 0; i < qtd; i++)
+        listaInserir(&j->lista, entidadeNova(FRAGMENTO, x + i * 5, alt, 3, 3, 3, PAR_FRAG));
+}
+
+void spawnEvento(Jogo *j, const Fase *f)
+{
+    double x = LARG;
+    int meta = j->fragFase >= f->meta;
+
+    if (meta && !j->joiaViva) {                           /* hora da joia */
+        listaInserir(&j->lista, entidadeNova(JOIA, x, rnd(2) ? 16 : 2, 7, 7, 3, PAR_JOIA));
+        j->joiaViva = 1;
+        return;
+    }
+
+    int r = rnd(100);
+    if (r < f->pctVoador) {                               /* obstaculo voador */
+        criarObstaculo(j, &f->mod[2], x);
+        if (!meta) criarTrilha(j, x + 22, 3, 3);
+    } else if (r < f->pctVoador + 50 || meta) {           /* obstaculo no chao */
+        const Modelo *m = &f->mod[rnd(2)];
+        criarObstaculo(j, m, x);
+        int lw = m->spr[0]->w;
+        if (rnd(100) < f->pctDupla) {                     /* obstaculo duplo */
+            const Modelo *m2 = &f->mod[rnd(2)];
+            criarObstaculo(j, m2, x + lw + 4);
+            lw += m2->spr[0]->w + 4;
+        }
+        if (!meta && rnd(100) < 75) criarTrilha(j, x + lw / 2 - 5, m->spr[0]->h + 3, 3);
+    } else {                                              /* so fragmentos */
+        criarTrilha(j, x, rnd(2) ? 16 : 3, 4);
+    }
+}
+
+/* move o mundo e trata colisoes; retorna 1 se pegou a joia */
+int atualizarMundo(Jogo *j, const Fase *f, double v)
+{
+    int pegouJoia = 0;
+    Entidade **pp = &j->lista;          /* ponteiro para o ponteiro: remove qualquer no */
+    while (*pp) {
+        Entidade *e = *pp;
+        int remover = 0;
+        e->x -= v;
+        if (e->x + e->w < 0) {
+            remover = 1;
+            if (e->tipo == JOIA) j->joiaViva = 0;
+        } else if (colide(&j->jog, e)) {
+            if (e->tipo == FRAGMENTO) {
+                j->fragFase++; j->fragTotal++;
+                j->th.dist += 0.5;
+                if (j->th.dist > f->distIni) j->th.dist = f->distIni;
+                remover = 1;
+            } else if (e->tipo == JOIA) {
+                pegouJoia = 1;
+                remover = 1;
+            } else if (j->jog.invul == 0) {
+                j->th.dist -= PENALIDADE;
+                j->jog.invul = 24;
+                remover = 1;
+            }
+        }
+        if (remover) { *pp = e->prox; free(e); }
+        else pp = &e->prox;
+    }
+    return pegouJoia;
+}
+
+void atualizarJogador(Jogador *p)
+{
+    if (!p->noChao) {
+        p->altura += p->vy;
+        p->vy -= GRAV;
+        if (p->altura <= 0) { p->altura = 0; p->vy = 0; p->noChao = 1; }
+    }
+    if (p->agachado > 0) p->agachado--;
+    if (p->invul > 0) p->invul--;
+}
 /* ================= FIM DA SECAO 3 ================= */
 
 
