@@ -3,3 +3,5 @@ av_asan
 scores.txt
 *.o
 teste*
+avengers_run
+av_asan
