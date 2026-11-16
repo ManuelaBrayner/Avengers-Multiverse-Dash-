@@ -287,6 +287,58 @@ void spritePreview(int x, int y, const Sprite *s, int cor)
 
 
 /* ================= SECAO 6 - DESENHO E FASE (Pessoa C) ================= */
+
+static void desenharJogo(Jogo *j, const Fase *f){ /*Cenário e personagens*/
+    /*Ponteiro para a tela virtual e apaga o quadro anterior, para começar do zero*/
+    Tela *t = j->tela;
+    telaLimpar(t);
+
+    /* chao */
+    int valor_oh = (int)j->offChao; /*offChao é o deslocamento do chão e valor_oh é esse valor convertido pra inteiro*/
+    for (int i = 0; i < LARG; i++) { /*Percorre todas as colunas*/
+        if (((unsigned int)(valor_oh + i) * 2654435761u >> 16) % 23 == 0){ /*constante de hash de Knuth*/
+            telaPut(t, i, GL + 2, 2);
+        /*O if decide se aquela coluna ganha um detalhe extra (tipo uma pedrinha) duas linhas abaixo, em GL + 2*/
+        }
+    }
+
+    /* obstaculos, fragmentos e joia (percorre a lista) */
+    int quadro = (int)((j->frame / 4) % 2); /*Animação alterna a cada 4 quadros*/
+    for (const Entidade *e = j->lista; e; e = e->prox) {
+        const Sprite *s; 
+        if (e->spr[1] && quadro){
+            s = e->spr[1]; /*Se a entidade tem um segundo sprite e estamos no quadro 1, usa o segundo*/
+        } else {
+            s = e->spr[0]; /* Senão usa o primeiro.*/
+        }
+        telaSprite(t, (int)floor(e->x), PES - e->alt - (s->h - 1), s, e->valor);
+        /*PES é o nível do chão*/
+    }
+
+    /* Thanos */
+    int dir = PX - 1 - (int)j->th.dist; /*dir é a coluna da borda direita do Thanos e PX é a coluna do jogador*/
+    telaSprite(t, dir - 13, PES - 17, &SPR_THANOS[(j->frame / 3) % 2], 2); /*SPR_THANOS[(frame / 3) % 2] alterna entre dois desenhos a cada 3 quadros, dando a animação*/
+
+    /* jogador (pisca quando leva dano) */
+    if (!(j->jog.invul > 0 && (j->frame % 4) < 2)) { /*Invunerável e fase "apagada"*/
+        int pose;
+        if (!j->jog.noChao){ /*no ar: pose de pulo*/
+            pose = 2;
+        } else if (j->jog.agachado > 0){ /*agachado*/
+            pose = 3;
+        } else { /*correndo: alterna 0 e 1*/
+            pose = (int)((j->frame / 3) % 2);
+        }
+        const Sprite *s = &SPR_JOG[j->sexo][pose];
+        telaSprite(t, PX, PES - (s->h - 1) - (int)(j->jog.altura + 0.5), s, 2);
+    }
+    telaDesenhar(t, f->cor);
+}
+
+
+
+
+
 /* ================= FIM DA SECAO 6 ================= */
 
 
