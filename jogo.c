@@ -399,7 +399,91 @@ static void desenharHud(const Jogo *j, const Fase *f, int idx){ /*Painel de info
     }
 }
 
+/* retorna 1 = venceu a fase, 0 = Thanos alcancou, -1 = saiu */
+static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
+    const Fase *f = &FASES[idx];
+    int resultado = 0, pausado = 0; /*0 = rodando, 1 = pausado*/
 
+    telaIntroFase(f, idx);
+
+    listaLiberar(&j->lista);
+    j->jog = (Jogador){ .sexo = j->sexo, .noChao = 1 }; /*jogador é reiniciado*/
+    j->th.dist = f->distIni; /*Thanos começa à distância inicial da fase*/
+    j->fragFase = 0;  /*Nenhum fragmento coletado nesta fase*/
+    j->joiaViva = 0; /*Não há joia em cena (provavelmente uma flag)*/
+    j->proxSpawn = 40; /*Contador até o próximo obstáculo/item aparecer*/
+    j->offChao = 0; /* O chão começa sem deslocamento */
+    j->frame = 0; /* Contador de quadros zerado */
+
+    limparTela(); /*Apaga o terminal*/
+    limparTeclado(); /*Descarta teclas que tenham sido pressionadas*/
+    timerInit(50);  /* 20 quadros por segundo */
+
+    for (;;) { /*Laço infinito que só termina por um goto fim, que aparece quando o jogador sai, vence ou perde*/
+        int t;
+        /*Lendo o teclado*/
+        while ((t = lerTecla()) != -1) { 
+            if (t == 'q' || t == 27 || t == 3) { resultado = -1; goto fim; } /*Sair do jogo*/
+            if (t == 'p') pausado = !pausado;
+            if (pausado) continue;
+
+            if (t == 'w' || t == ' ' || t == TECLA_CIMA) { /*Pular*/
+                if (j->jog.noChao) { 
+                    j->jog.vy = PULO; j->jog.noChao = 0; j->jog.agachado = 0; 
+                }
+            } else if (t == 's' || t == TECLA_BAIXO) { /*Agachar*/
+                if (j->jog.noChao) {
+                    j->jog.agachado = 10;
+                } else {
+                    j->jog.vy = QUEDA;
+                }
+            }
+        }
+
+        /*Cálculo da velocidade*/
+        if (timerTimeOver() && !pausado) { 
+            int frags;
+            if (j->fragFase > f->meta) {
+                frags = f->meta;
+            } else {
+                frags = j->fragFase;
+            }
+            double prog = (double)frags / f->meta;
+            double v = f->vel * (1.0 + 0.25 * prog); /* Acelera dentro da fase conforme coleta fragmentos */
+
+            /*Atualizando o jogo e mundo*/
+            atualizarJogador(&j->jog);
+            if (atualizarMundo(j, f, v)) { resultado = 1; goto fim; }
+
+            /*Gerar novos obstáculos*/
+            j->proxSpawn = j->proxSpawn - v; /*Diminui o contador de spawn pela velocidade atual do jogo*/
+            if (j->proxSpawn <= 0) {
+                spawnEvento(j, f);
+                j->proxSpawn = f->gapMin + v * 14 + rnd(f->gapVar);
+            }
+
+            /*Thanos*/
+            j->th.dist += 0.03;  /* Thanos se afasta devagar */
+            if (j->th.dist > f->distIni) { j->th.dist = f->distIni; } /* Thanos não pode se afastar mais que a distância inicial */
+            if (j->th.dist <= 0) { resultado = 0; goto fim; } /*Thanos alcançou o jogador*/
+
+            /*Avancar o estado*/
+            j->offChao += v;  /*O chão anda (usado nas pedrinhas)*/
+            j->metros += v * 0.25;  /*Distância percorrida (conta para a pontuação)*/
+            j->frame++;  /*Próximo quadro (usado nas animações)*/
+
+            /*Desenhar*/
+            desenharJogo(j, f);  /*Monta o cenário e personagens*/
+            desenharHud(j, f, idx);  /*Escreve o painel*/
+            screenUpdate();  /*Envia tudo ao terminal*/
+        }
+        usleep(2000); /*A cada volta do laço, o programa pausa por 2000 microsegundos; fim do laço*/
+    }
+
+fim: /*Rótulo para onde o goto pula*/
+    listaLiberar(&j->lista);
+    return resultado; /*1, 0 ou -1; comunica o resultado a jogarPartida*/
+}
 
 /* ================= FIM DA SECAO 6 ================= */
 
