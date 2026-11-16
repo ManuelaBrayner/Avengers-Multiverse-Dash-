@@ -366,8 +366,12 @@ static void desenharHud(const Jogo *j, const Fase *f, int idx){ /*Painel de info
 
     /* Barra de distancia do Thanos */
     double prop = j->th.dist / f->distIni;  /*Fração que resta entre eu e o Thanos (distância atual / distância inicial)*/
-    if (prop < 0) prop = 0;
-    if (prop > 1) prop = 1;
+    if (prop < 0) {
+        prop = 0;
+    }
+    if (prop > 1) {
+        prop = 1;
+    }
     int cheio = (int)(prop * 20); /*Quantos dos 20 blocos da barra ficam preenchidos*/
 
     screenGotoxy(5, 22);
@@ -423,9 +427,15 @@ static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
         int t;
         /*Lendo o teclado*/
         while ((t = lerTecla()) != -1) { 
-            if (t == 'q' || t == 27 || t == 3) { resultado = -1; goto fim; } /*Sair do jogo*/
-            if (t == 'p') pausado = !pausado;
-            if (pausado) continue;
+            if (t == 'q' || t == 27 || t == 3) { 
+                resultado = -1; goto fim; 
+            } /*Sair do jogo*/
+            if (t == 'p') {
+                pausado = !pausado;
+            }
+            if (pausado) {
+                continue;
+            }
 
             if (t == 'w' || t == ' ' || t == TECLA_CIMA) { /*Pular*/
                 if (j->jog.noChao) { 
@@ -453,7 +463,9 @@ static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
 
             /*Atualizando o jogo e mundo*/
             atualizarJogador(&j->jog);
-            if (atualizarMundo(j, f, v)) { resultado = 1; goto fim; }
+            if (atualizarMundo(j, f, v)) { 
+                resultado = 1; goto fim; 
+            }
 
             /*Gerar novos obstáculos*/
             j->proxSpawn = j->proxSpawn - v; /*Diminui o contador de spawn pela velocidade atual do jogo*/
@@ -464,8 +476,12 @@ static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
 
             /*Thanos*/
             j->th.dist += 0.03;  /* Thanos se afasta devagar */
-            if (j->th.dist > f->distIni) { j->th.dist = f->distIni; } /* Thanos não pode se afastar mais que a distância inicial */
-            if (j->th.dist <= 0) { resultado = 0; goto fim; } /*Thanos alcançou o jogador*/
+            if (j->th.dist > f->distIni) { 
+                j->th.dist = f->distIni; 
+            } /* Thanos não pode se afastar mais que a distância inicial */
+            if (j->th.dist <= 0) { 
+                resultado = 0; goto fim; 
+            } /*Thanos alcançou o jogador*/
 
             /*Avancar o estado*/
             j->offChao += v;  /*O chão anda (usado nas pedrinhas)*/
