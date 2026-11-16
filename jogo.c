@@ -272,6 +272,29 @@ void spritePreview(int x, int y, const Sprite *s, int cor)
 
 
 /* ================= SECAO 3 - MUNDO (Pessoa B) ================= */
+Entidade *entidadeNova(TipoEnt tipo, double x, int alt, int w, int h,
+                       int valor, const Sprite *const *sp)
+{
+    Entidade *e = xmalloc(sizeof *e);
+    e->tipo = tipo; e->x = x; e->alt = alt; e->w = w; e->h = h; e->valor = valor;
+    e->spr[0] = sp[0];
+    e->spr[1] = sp[1];
+    e->prox = NULL;
+    return e;
+}
+
+void listaInserir(Entidade **lista, Entidade *novo)
+{
+    novo->prox = *lista;
+    *lista = novo;
+}
+
+void listaLiberar(Entidade **lista)
+{
+    Entidade *e = *lista;
+    while (e) { Entidade *p = e->prox; free(e); e = p; }
+    *lista = NULL;
+}
 /* ================= FIM DA SECAO 3 ================= */
 
 
