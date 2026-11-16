@@ -277,11 +277,295 @@ void spritePreview(int x, int y, const Sprite *s, int cor)
 
 
 /* ================= SECAO 4 - RANKING (Pessoa D) ================= */
+// cria um no novo e coloca ele ja na posicao certa (maior pontuacao primeiro)
+// devolve a cabeca da lista (ela muda se o novo for o maior)
+// novoOut devolve o no criado (para destacar na tela). pode ser NULL
+Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score **novoOut)
+{
+    Score *novo = xmalloc(sizeof(Score));
+    snprintf(novo->nome, sizeof novo->nome, "%s", nome);
+    novo->pontos = pontos;
+    novo->joias = joias;
+    novo->prox = NULL;
+ 
+    if (novoOut != NULL) {
+        *novoOut = novo;
+    }
+ 
+    // lista vazia ou novo e o maior de todos: vira a cabeca
+    if (ini == NULL || pontos > ini->pontos) {
+        novo->prox = ini;
+        return novo;
+    }
+ 
+    // senao anda ate o ultimo que tem pontos >= (no empate, quem ja estava fica na frente)
+    Score *atual = ini;
+    while (atual->prox != NULL && atual->prox->pontos >= pontos) {
+        atual = atual->prox;
+    }
+    novo->prox = atual->prox;
+    atual->prox = novo;
+    return ini;
+}
+ 
+// le o arquivo e monta a lista ordenada. se o arquivo nao existe, devolve lista vazia
+Score *rankingCarregar(const char *arq)
+{
+    FILE *f = fopen(arq, "r");
+    if (f == NULL) {
+        return NULL;
+    }
+ 
+    Score *lista = NULL;
+    char nome[32];
+    int pontos, joias;
+ 
+    // %15s -> no maximo 15 letras, porque nome[16] precisa do '\0'
+    while (fscanf(f, "%15s %d %d", nome, &pontos, &joias) == 3) {
+        lista = rankingInserir(lista, nome, pontos, joias, NULL);
+    }
+    fclose(f);
+    return lista;
+}
+ 
+// grava os MAX_RANK melhores no arquivo (o "w" apaga o conteudo antigo)
+void rankingSalvar(const Score *lista, const char *arq)
+{
+    FILE *f = fopen(arq, "w");
+    if (f == NULL) {
+        return;
+    }
+ 
+    int n = 0;
+    for (const Score *s = lista; s != NULL && n < MAX_RANK; s = s->prox) {
+        fprintf(f, "%s %d %d\n", s->nome, s->pontos, s->joias);
+        n++;
+    }
+    fclose(f);
+}
+ 
+// libera todos os nos
+void rankingLiberar(Score *lista)
+{
+    while (lista != NULL) {
+        Score *prox = lista->prox;   // guarda o proximo ANTES do free
+        free(lista);
+        lista = prox;
+    }
+}
+
+// desenha a tabela. o no 'destaque' (pode ser NULL) aparece em vermelho
+void rankingMostrar(const Score *lista, const Score *destaque)
+{
+    centro(4, TXT, "RANKING");
+    escrever(22, 6, SUAVE, "POS  NOME           PONTOS  JOIAS");
+ 
+    int n = 0;
+    for (const Score *s = lista; s != NULL && n < MAX_RANK; s = s->prox) {
+        int cor = TXT;
+        if (s == destaque) {
+            cor = RED;
+        }
+        escrever(22, 7 + n, cor, "%2d   %-12s  %6d  %d/%d",
+                 n + 1, s->nome, s->pontos, s->joias, NUM_FASES);
+        n++;
+    }
+ 
+    if (n == 0) {
+        centro(9, SUAVE, "Nenhuma partida ainda.");
+    }
+}
 /* ================= FIM DA SECAO 4 ================= */
 
 
-
 /* ================= SECAO 5 - MENUS E TELAS (Pessoa D) ================= */
+// carrega o ranking, mostra, libera e espera Enter
+void telaRanking(void)
+{
+    Score *r = rankingCarregar(ARQ_SCORES);
+ 
+    limparTela();
+    rankingMostrar(r, NULL);
+    centro(20, SUAVE, "ENTER para voltar");
+    screenUpdate();
+ 
+    rankingLiberar(r);
+    esperarEnter();
+}
+ 
+// le o nome tecla por tecla (letras, numeros e hifen; Backspace apaga)
+// dest precisa ter espaco para max + 1 caracteres
+void lerNome(char *dest, int max, int x, int y)
+{
+    int n = 0;
+    dest[0] = '\0';
+    limparTeclado();
+ 
+    while (1) {
+        // mostra o nome com '_' de cursor e apaga a sobra com espacos
+        escrever(x, y, TXT, "%s_%*s", dest, max - n, "");
+        screenUpdate();
+ 
+        int t;
+        while ((t = lerTeclaBruta()) == -1) {
+            usleep(10000);
+        }
+ 
+        if (t == 10 || t == 13) {                       // Enter termina
+            break;
+        }
+        if ((t == 127 || t == 8) && n > 0) {            // Backspace apaga
+            n--;
+            dest[n] = '\0';
+        } else if (t > 0 && t < 128 && n < max && (isalnum(t) || t == '-')) {
+            dest[n] = (char)t;
+            n++;
+            dest[n] = '\0';
+        }
+    }
+ 
+    if (n == 0) {
+        snprintf(dest, max + 1, "ANONIMO");
+    }
+}
+ 
+// tela que aparece antes de cada fase
+void telaIntroFase(const Fase *f, int idx)
+{
+    limparTela();
+    centro(5, f->cor, "FASE %d  -  %s", idx + 1, f->cenario);
+    centro(7, TXT, "%s", f->joia);
+    centro(10, SUAVE, "%s", f->intro1);
+    centro(11, SUAVE, "%s", f->intro2);
+    centro(14, TXT, "Junte %d fragmentos e pegue a joia.", f->meta);
+    centro(20, SUAVE, "ENTER para correr");
+    screenUpdate();
+    esperarEnter();
+}
+
+// tela que aparece quando pega a joia da fase
+void telaJoiaConquistada(const Jogo *j, int idx)
+{
+    const Fase *f = &FASES[idx];
+ 
+    limparTela();
+    centro(6, f->cor, "%s conquistada!", f->joia);
+    spritePreview(38, 9, &SP_JOIA, f->cor);
+    centro(14, TXT, "Pontos: %d    Joias: %d/%d", pontosTotais(j), j->nJoias, NUM_FASES);
+    centro(20, SUAVE, "ENTER para continuar");
+    screenUpdate();
+    esperarEnter();
+}
+ 
+// fim da partida: mostra resultado, pede o nome, salva e mostra o ranking
+void fimDeJogo(Jogo *j, int venceu, int ultimaFase)
+{
+    limparTela();
+    if (venceu) {
+        centro(5, GREEN, "Voce reuniu as 6 Joias do Infinito!");
+        j->bonus = 2000;
+    } else {
+        centro(5, RED, "Thanos te alcancou!");
+        centro(6, SUAVE, "Fase %d: %s", ultimaFase + 1, FASES[ultimaFase].cenario);
+    }
+    centro(9, TXT, "Pontos: %d    Joias: %d/%d", pontosTotais(j), j->nJoias, NUM_FASES);
+    centro(12, TXT, "Seu nome (ate 12 letras) e ENTER:");
+    screenUpdate();
+ 
+    char nome[16];
+    lerNome(nome, 12, 34, 14);
+ 
+    // carrega, insere o novo, salva (so os 8 melhores vao pro arquivo)
+    Score *r = rankingCarregar(ARQ_SCORES);
+    Score *novo = NULL;
+    r = rankingInserir(r, nome, pontosTotais(j), j->nJoias, &novo);
+    rankingSalvar(r, ARQ_SCORES);
+ 
+    // descobre em que posicao o novo ficou
+    int pos = 1;
+    for (const Score *s = r; s != NULL && s != novo; s = s->prox) {
+        pos++;
+    }
+ 
+    limparTela();
+    rankingMostrar(r, novo);
+    if (pos > MAX_RANK) {
+        centro(17, SUAVE, "Voce ficou na posicao %d (so os %d melhores aparecem).", pos, MAX_RANK);
+    }
+    centro(20, SUAVE, "ENTER para voltar ao menu");
+    screenUpdate();
+ 
+    rankingLiberar(r);
+    esperarEnter();
+}
+
+// menu principal. devolve 1 (jogar), 2 (ranking), 3 (como jogar) ou 4 (sair)
+int menuPrincipal(void)
+{
+    limparTela();
+    centro(5, TXT, "A V E N G E R S    R U N");
+    centro(7, SUAVE, "Fuja de Thanos e reuna as 6 Joias do Infinito");
+    escrever(34, 11, TXT, "[1] Jogar");
+    escrever(34, 13, TXT, "[2] Ranking");
+    escrever(34, 15, TXT, "[3] Como jogar");
+    escrever(34, 17, TXT, "[4] Sair");
+    screenUpdate();
+ 
+    limparTeclado();
+    while (1) {
+        int t = lerTecla();
+        if (t >= '1' && t <= '4') {
+            return t - '0';
+        }
+        usleep(10000);
+    }
+}
+ 
+// escolha do personagem. devolve 0 (homem), 1 (mulher) ou -1 (voltar)
+int escolherPersonagem(void)
+{
+    limparTela();
+    centro(4, TXT, "Escolha seu personagem");
+    for (int p = 0; p < 2; p++) {
+        int x = 22;
+        if (p == 1) {
+            x = 50;
+        }
+        escrever(x - 1, 8, TXT, "[%d] %s", p + 1, NOME_JOGADOR[p]);
+        spritePreview(x + 2, 11, &SPR_JOG[p][0], TXT);
+    }
+    centro(20, SUAVE, "[0] voltar");
+    screenUpdate();
+ 
+    limparTeclado();
+    while (1) {
+        int t = lerTecla();
+        if (t == '1') return 0;
+        if (t == '2') return 1;
+        if (t == '0' || t == 27) return -1;
+        usleep(10000);
+    }
+}
+ 
+// regras e controles
+void telaComoJogar(void)
+{
+    limparTela();
+    centro(3, TXT, "Como jogar");
+    escrever(10, 6, TXT, "Fuja de Thanos! Em cada fase (uma Joia do Infinito):");
+    escrever(10, 8, SUAVE, "1. Junte os fragmentos para a joia aparecer.");
+    escrever(10, 9, SUAVE, "2. Pegue a joia para passar de fase.");
+    escrever(10, 10, SUAVE, "3. Bater num obstaculo aproxima Thanos.");
+    escrever(10, 11, SUAVE, "4. Se ele te alcancar, acabou.");
+    escrever(10, 14, TXT, "Controles:");
+    escrever(12, 15, SUAVE, "W / ESPACO ... pular");
+    escrever(12, 16, SUAVE, "S ............ agachar (no ar: cair rapido)");
+    escrever(12, 17, SUAVE, "P ............ pausa      Q ... sair da fase");
+    centro(20, SUAVE, "ENTER para voltar");
+    screenUpdate();
+    esperarEnter();
+}
+
 /* ================= FIM DA SECAO 5 ================= */
 
 
