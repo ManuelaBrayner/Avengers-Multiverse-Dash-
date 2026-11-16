@@ -335,7 +335,69 @@ static void desenharJogo(Jogo *j, const Fase *f){ /*Cenário e personagens*/
     telaDesenhar(t, f->cor);
 }
 
+/*Escrito direto no terminal diferentemente de desenharJogo*/
+static void desenharHud(const Jogo *j, const Fase *f, int idx){ /*Painel de informações (fase, pontos, barra do Thanos, joias)*/
+    int pts = pontosTotais(j);
+    int hi; /*Guarda resultado; Maior entre o recordo salvo e os pontos atuais*/
+    if (j->recorde > pts) {
+        hi = j->recorde;
+    } else {
+        hi = pts;
+    }
 
+    int frag;
+    if(j->fragFase > f->meta) {
+        frag = f->meta;
+    } else {
+        frag = j->fragFase;
+    }
+
+    screenGotoxy(5, 2);
+    screenSetColor(TXT, FUNDO);
+    printf("FASE %d/%d  ", idx + 1, NUM_FASES); /*Mostra a fase atual*/
+    screenSetColor(f->cor, FUNDO);
+    printf("%-10s", f->cenario); /*Mostra o nome do cenário na cor da fase*/
+    screenSetColor(TXT, FUNDO);
+    printf("   FRAG %02d/%02d", frag, f->meta); /*Mostra os fragmentos coletados*/
+    screenSetColor(SUAVE, FUNDO);
+    printf("      HI %06d", hi); /*Recorde com 6 dígitos*/
+    screenSetColor(TXT, FUNDO);
+    printf("  %06d  ", pts); /*Mostra os pontos atuais*/
+
+    /* Barra de distancia do Thanos */
+    double prop = j->th.dist / f->distIni;  /*Fração que resta entre eu e o Thanos (distância atual / distância inicial)*/
+    if (prop < 0) prop = 0;
+    if (prop > 1) prop = 1;
+    int cheio = (int)(prop * 20); /*Quantos dos 20 blocos da barra ficam preenchidos*/
+
+    screenGotoxy(5, 22);
+    printf("THANOS ");
+    if (prop > 0.4){
+        screenSetColor(TXT, FUNDO); /*Barra fica na cor normal*/
+    } else {
+        screenSetColor(RED, FUNDO); /*Barra fica vermelha quando Thanos está perto*/
+    }
+
+    for (int i = 0; i < 20; i++) {
+        if (i < cheio) {
+            fputs("█", stdout); /*Bloco cheio*/
+        } else {
+            fputs("░", stdout); /*Bloco vazio, claro*/
+        } /*stdout assumindo a saída padrão na tela e fputs porque não há formatação a fazer*/
+    }
+
+    screenSetColor(TXT, FUNDO);
+    printf("    JOIAS ");
+    for (int i = 0; i < NUM_FASES; i++) { /*Mostra uma joia por fase*/
+        if (j->joias[i]) {
+            screenSetColor(FASES[i].cor, FUNDO);
+            printf("◆ "); /*Joia coletada*/
+        } else {
+            screenSetColor(SUAVE, FUNDO);
+            printf("◇ "); /*Joia ainda não coletada*/
+        }
+    }
+}
 
 
 
