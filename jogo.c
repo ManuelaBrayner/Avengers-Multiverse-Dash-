@@ -406,7 +406,7 @@ static void desenharHud(const Jogo *j, const Fase *f, int idx){ /*Painel de info
 /* retorna 1 = venceu a fase, 0 = Thanos alcancou, -1 = saiu */
 static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
     const Fase *f = &FASES[idx];
-    int resultado = 0, pausado = 0; /*0 = rodando, 1 = pausado*/
+    int resultado = -2, pausado = 0; /*0 = rodando, 1 = pausado*/
 
     telaIntroFase(f, idx);
 
@@ -423,13 +423,14 @@ static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
     limparTeclado(); /*Descarta teclas que tenham sido pressionadas*/
     timerInit(50);  /* 20 quadros por segundo */
 
-    for (;;) { /*Laço infinito que só termina por um goto fim, que aparece quando o jogador sai, vence ou perde*/
+    while (resultado == -2) {
         int t;
         /*Lendo o teclado*/
         while ((t = lerTecla()) != -1) { 
             if (t == 'q' || t == 27 || t == 3) { 
-                resultado = -1; goto fim; 
-            } /*Sair do jogo*/
+                resultado = -1;
+                break;
+            } 
             if (t == 'p') {
                 pausado = !pausado;
             }
@@ -450,6 +451,11 @@ static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
             }
         }
 
+        /* Se o jogador apertou para sair, pula o restante da iteração */
+        if (resultado != -2) {
+            break;
+        }
+
         /*Cálculo da velocidade*/
         if (timerTimeOver() && !pausado) { 
             int frags;
@@ -464,41 +470,44 @@ static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
             /*Atualizando o jogo e mundo*/
             atualizarJogador(&j->jog);
             if (atualizarMundo(j, f, v)) { 
-                resultado = 1; goto fim; 
+                resultado = 1; 
+            } else {
+                /*Gerar novos obstáculos*/
+                j->proxSpawn = j->proxSpawn - v; /*Diminui o contador de spawn pela velocidade atual do jogo*/
+                if (j->proxSpawn <= 0) {
+                    spawnEvento(j, f);
+                    j->proxSpawn = f->gapMin + v * 14 + rnd(f->gapVar);
+                }
+
+                /*Thanos*/
+                j->th.dist += 0.03;  /* Thanos se afasta devagar */
+                if (j->th.dist > f->distIni) { 
+                    j->th.dist = f->distIni; 
+                } /* Thanos não pode se afastar mais que a distância inicial */
+                if (j->th.dist <= 0) { 
+                    resultado = 0; 
+                } /*Thanos alcançou o jogador*/
             }
 
-            /*Gerar novos obstáculos*/
-            j->proxSpawn = j->proxSpawn - v; /*Diminui o contador de spawn pela velocidade atual do jogo*/
-            if (j->proxSpawn <= 0) {
-                spawnEvento(j, f);
-                j->proxSpawn = f->gapMin + v * 14 + rnd(f->gapVar);
+            /*Avancar o estado e desenhar*/
+            if(resultado == -2) {
+                j->offChao += v;  /*O chão anda (usado nas pedrinhas)*/
+                j->metros += v * 0.25;  /*Distância percorrida (conta para a pontuação)*/
+                j->frame++;  /*Próximo quadro (usado nas animações)*/
+            
+
+                /*Desenhar*/
+                desenharJogo(j, f);  /*Monta o cenário e personagens*/
+                desenharHud(j, f, idx);  /*Escreve o painel*/
+                screenUpdate();  /*Envia tudo ao terminal*/
             }
-
-            /*Thanos*/
-            j->th.dist += 0.03;  /* Thanos se afasta devagar */
-            if (j->th.dist > f->distIni) { 
-                j->th.dist = f->distIni; 
-            } /* Thanos não pode se afastar mais que a distância inicial */
-            if (j->th.dist <= 0) { 
-                resultado = 0; goto fim; 
-            } /*Thanos alcançou o jogador*/
-
-            /*Avancar o estado*/
-            j->offChao += v;  /*O chão anda (usado nas pedrinhas)*/
-            j->metros += v * 0.25;  /*Distância percorrida (conta para a pontuação)*/
-            j->frame++;  /*Próximo quadro (usado nas animações)*/
-
-            /*Desenhar*/
-            desenharJogo(j, f);  /*Monta o cenário e personagens*/
-            desenharHud(j, f, idx);  /*Escreve o painel*/
-            screenUpdate();  /*Envia tudo ao terminal*/
         }
-        usleep(2000); /*A cada volta do laço, o programa pausa por 2000 microsegundos; fim do laço*/
+        if (resultado == -2) {
+            usleep(2000); /*A cada volta do laço, o programa pausa por 2000 microsegundos; fim do laço*/
+        }
     }
-
-fim: /*Rótulo para onde o goto pula*/
     listaLiberar(&j->lista);
-    return resultado; /*1, 0 ou -1; comunica o resultado a jogarPartida*/
+    return resultado; 
 }
 
 /* ================= FIM DA SECAO 6 ================= */
