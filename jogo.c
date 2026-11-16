@@ -295,6 +295,21 @@ void listaLiberar(Entidade **lista)
     while (e) { Entidade *p = e->prox; free(e); e = p; }
     *lista = NULL;
 }
+
+int pontosTotais(const Jogo *j)
+{
+    return (int)j->metros + j->fragTotal * 10 + j->nJoias * 500 + j->bonus;
+}
+
+int colide(const Jogador *p, const Entidade *e)
+{
+    int ini = (int)floor(e->x), fim = ini + e->w - 1;
+    if (e->tipo == OBSTACULO) { ini++; fim--; }          /* hitbox um pouco menor */
+    if (ini > PX + 6 || fim < PX + 2) return 0;          /* horizontal */
+    int ra = (int)(p->altura + 0.5);
+    int ph = (p->agachado > 0 && p->noChao) ? 7 : 11;    /* altura do jogador */
+    return ra < e->alt + e->h && e->alt < ra + ph;       /* vertical */
+}
 /* ================= FIM DA SECAO 3 ================= */
 
 
