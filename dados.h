@@ -120,7 +120,5 @@ static const Fase FASES[NUM_FASES] = {
     { {"Rochas", {&SP_PEDRA, NULL}, 0}, {"Espectro", {&SP_ROBO, NULL}, 0}, {"Corvo", {&SP_CORVO_A, &SP_CORVO_B}, VOO} } } 
 };
 
-static const char *BLK[4] = { " ", "▀", "▄", "█" }; /*vazio, só a metade de cima, só a metade de baixo, as duas metades preenchidas*/
-/*BLK = Vetor de 4 strings com caracteres de bloco usados para desenhar na tela; desenhar 2 pixels verticais por caractere*/
 
 #endif
