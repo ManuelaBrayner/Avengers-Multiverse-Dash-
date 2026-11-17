@@ -883,23 +883,18 @@ static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
 /* ================= FIM DA SECAO 6 ================= */
 
 
-
 /* ================= SECAO 7 - JOGARPARTIDA E MAIN (todos) ================= */
 
 // roda as 6 fases em sequencia e chama o fim de jogo
-void jogarPartida(Jogo *j, int sexo){
-    int venceu = 0;
-    int ultima = 0;
- 
+void jogarPartida(Jogo *j, int sexo)
+{
     j->sexo = sexo;
     j->metros = 0;
     j->fragTotal = 0;
     j->nJoias = 0;
     j->bonus = 0;
-    for (int i = 0; i < NUM_FASES; i++) {
-        j->joias[i] = 0;
-    }
- 
+    memset(j->joias, 0, sizeof j->joias);
+
     // o recorde (HI) e o primeiro do ranking
     Score *r = rankingCarregar(ARQ_SCORES);
     if (r != NULL) {
@@ -908,11 +903,10 @@ void jogarPartida(Jogo *j, int sexo){
         j->recorde = 0;
     }
     rankingLiberar(r);
- 
+
     for (int i = 0; i < NUM_FASES; i++) {
-        ultima = i;
         int res = jogarFase(j, i);
- 
+
         if (res < 0) {
             return;                 // saiu: volta ao menu sem salvar
         }
@@ -922,25 +916,23 @@ void jogarPartida(Jogo *j, int sexo){
         j->joias[i] = 1;
         j->nJoias++;
         telaJoiaConquistada(j, i);
-        if (i == NUM_FASES - 1) {
-            venceu = 1;
-        }
     }
-    fimDeJogo(j, venceu, ultima);
+    fimDeJogo(j);
 }
- 
+
 #ifndef SEM_MAIN
-int main(void){
+int main(void)
+{
     srand((unsigned)time(NULL));
     screenInit(0);
     keyboardInit();
     timerInit(50);
     limparTeclado();
- 
+
     Jogo *j = xmalloc(sizeof(Jogo));
     memset(j, 0, sizeof(Jogo));
     j->tela = telaCriar(LARG, ALTP);
- 
+
     int sair = 0;
     while (!sair) {
         int op = menuPrincipal();
@@ -957,17 +949,16 @@ int main(void){
             sair = 1;
         }
     }
- 
+
     // limpeza: sem isso o terminal fica sem eco e sem cursor
     listaLiberar(&j->lista);
     telaLiberar(j->tela);
     free(j);
- 
+
     keyboardDestroy();
     timerDestroy();
     screenDestroy();
     return 0;
 }
 #endif
-
 /* ================= FIM DA SECAO 7 ================= */
