@@ -475,35 +475,38 @@ void rankingMostrar(const Score *lista, const Score *destaque)
 
 /* ================= SECAO 5 - MENUS E TELAS (Pessoa D) ================= */
 // carrega o ranking, mostra, libera e espera Enter
-void telaRanking(void){
+// carrega o ranking, mostra, libera e espera Enter
+void telaRanking(void)
+{
     Score *r = rankingCarregar(ARQ_SCORES);
- 
+
     limparTela();
     rankingMostrar(r, NULL);
     centro(20, SUAVE, "ENTER para voltar");
     screenUpdate();
- 
+
     rankingLiberar(r);
     esperarEnter();
 }
- 
+
 // le o nome tecla por tecla (letras, numeros e hifen; Backspace apaga)
 // dest precisa ter espaco para max + 1 caracteres
-void lerNome(char *dest, int max, int x, int y){
+void lerNome(char *dest, int max, int x, int y)
+{
     int n = 0;
     dest[0] = '\0';
     limparTeclado();
- 
+
     while (1) {
-        // mostra o nome com '_' de cursor e apaga a sobra com espacos
-        escrever(x, y, TXT, "%s_%*s", dest, max - n, "");
+        // mostra o nome com '_' de cursor (o espaco no fim apaga a letra apagada)
+        escrever(x, y, TXT, "%s_ ", dest);
         screenUpdate();
- 
+
         int t;
         while ((t = lerTeclaBruta()) == -1) {
             usleep(10000);
         }
- 
+
         if (t == 10 || t == 13) {                       // Enter termina
             break;
         }
@@ -516,7 +519,7 @@ void lerNome(char *dest, int max, int x, int y){
             dest[n] = '\0';
         }
     }
- 
+
     if (n == 0) {
         snprintf(dest, max + 1, "ANONIMO");
     }
