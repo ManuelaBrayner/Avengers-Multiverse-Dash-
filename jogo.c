@@ -526,7 +526,8 @@ void lerNome(char *dest, int max, int x, int y)
 }
  
 // tela que aparece antes de cada fase
-void telaIntroFase(const Fase *f, int idx){
+void telaIntroFase(const Fase *f, int idx)
+{
     limparTela();
     centro(5, f->cor, "FASE %d  -  %s", idx + 1, f->cenario);
     centro(7, TXT, "%s", f->joia);
@@ -539,9 +540,10 @@ void telaIntroFase(const Fase *f, int idx){
 }
 
 // tela que aparece quando pega a joia da fase
-void telaJoiaConquistada(const Jogo *j, int idx){
+void telaJoiaConquistada(const Jogo *j, int idx)
+{
     const Fase *f = &FASES[idx];
- 
+
     limparTela();
     centro(6, f->cor, "%s conquistada!", f->joia);
     spritePreview(38, 9, &SP_JOIA, f->cor);
@@ -550,50 +552,45 @@ void telaJoiaConquistada(const Jogo *j, int idx){
     screenUpdate();
     esperarEnter();
 }
- 
+
 // fim da partida: mostra resultado, pede o nome, salva e mostra o ranking
-void fimDeJogo(Jogo *j, int venceu, int ultimaFase){
+void fimDeJogo(Jogo *j)
+{
+    int venceu = (j->nJoias == NUM_FASES);   // pegou as 6 joias = venceu
+
     limparTela();
     if (venceu) {
         centro(5, GREEN, "Voce reuniu as 6 Joias do Infinito!");
         j->bonus = 2000;
     } else {
         centro(5, RED, "Thanos te alcancou!");
-        centro(6, SUAVE, "Fase %d: %s", ultimaFase + 1, FASES[ultimaFase].cenario);
+        centro(6, SUAVE, "Fase %d: %s", j->nJoias + 1, FASES[j->nJoias].cenario);   // perdeu na fase seguinte as joias que tem
     }
     centro(9, TXT, "Pontos: %d    Joias: %d/%d", pontosTotais(j), j->nJoias, NUM_FASES);
     centro(12, TXT, "Seu nome (ate 12 letras) e ENTER:");
     screenUpdate();
- 
+
     char nome[16];
     lerNome(nome, 12, 34, 14);
- 
+
     // carrega, insere o novo, salva (so os 8 melhores vao pro arquivo)
     Score *r = rankingCarregar(ARQ_SCORES);
     Score *novo = NULL;
     r = rankingInserir(r, nome, pontosTotais(j), j->nJoias, &novo);
     rankingSalvar(r, ARQ_SCORES);
- 
-    // descobre em que posicao o novo ficou
-    int pos = 1;
-    for (const Score *s = r; s != NULL && s != novo; s = s->prox) {
-        pos++;
-    }
- 
+
     limparTela();
     rankingMostrar(r, novo);
-    if (pos > MAX_RANK) {
-        centro(17, SUAVE, "Voce ficou na posicao %d (so os %d melhores aparecem).", pos, MAX_RANK);
-    }
     centro(20, SUAVE, "ENTER para voltar ao menu");
     screenUpdate();
- 
+
     rankingLiberar(r);
     esperarEnter();
 }
 
 // menu principal. devolve 1 (jogar), 2 (ranking), 3 (como jogar) ou 4 (sair)
-int menuPrincipal(void){
+int menuPrincipal(void)
+{
     limparTela();
     centro(5, TXT, "A V E N G E R S    R U N");
     centro(7, SUAVE, "Fuja de Thanos e reuna as 6 Joias do Infinito");
@@ -602,7 +599,7 @@ int menuPrincipal(void){
     escrever(34, 15, TXT, "[3] Como jogar");
     escrever(34, 17, TXT, "[4] Sair");
     screenUpdate();
- 
+
     limparTeclado();
     while (1) {
         int t = lerTecla();
@@ -612,22 +609,20 @@ int menuPrincipal(void){
         usleep(10000);
     }
 }
- 
+
 // escolha do personagem. devolve 0 (homem), 1 (mulher) ou -1 (voltar)
-int escolherPersonagem(void){
+int escolherPersonagem(void)
+{
     limparTela();
     centro(4, TXT, "Escolha seu personagem");
     for (int p = 0; p < 2; p++) {
-        int x = 22;
-        if (p == 1) {
-            x = 50;
-        }
+        int x = 22 + p * 28;   // p=0 -> 22, p=1 -> 50
         escrever(x - 1, 8, TXT, "[%d] %s", p + 1, NOME_JOGADOR[p]);
         spritePreview(x + 2, 11, &SPR_JOG[p][0], TXT);
     }
     centro(20, SUAVE, "[0] voltar");
     screenUpdate();
- 
+
     limparTeclado();
     while (1) {
         int t = lerTecla();
