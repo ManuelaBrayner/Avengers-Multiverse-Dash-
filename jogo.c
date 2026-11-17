@@ -17,8 +17,7 @@
 /* ================= SECAO 1 - UTILITARIOS (Pessoa A) ================= */
 
 // pede memoria. se nao tiver, fecha o programa
-void *xmalloc(size_t n)
-{
+void *xmalloc(size_t n){
     void *p = malloc(n);
     if (p == NULL) {
         keyboardDestroy();
@@ -30,14 +29,12 @@ void *xmalloc(size_t n)
 }
 
 // numero aleatorio de 0 ate n-1
-int rnd(int n)
-{
+int rnd(int n){
     return rand() % n;
 }
 
 // le uma tecla. devolve -1 se nao tem nenhuma
-int lerTeclaBruta(void)
-{
+int lerTeclaBruta(void){
     if (keyhit() == 0) {
         return -1;
     }
@@ -61,8 +58,7 @@ int lerTeclaBruta(void)
 }
 
 // igual a de cima, mas transforma maiuscula em minuscula
-int lerTecla(void)
-{
+int lerTecla(void){
     int c = lerTeclaBruta();
     if (c >= 'A' && c <= 'Z') {
         c = c + 32;
@@ -71,16 +67,14 @@ int lerTecla(void)
 }
 
 // joga fora as teclas que estavam esperando
-void limparTeclado(void)
-{
+void limparTeclado(void){
     while (keyhit()) {
         readch();
     }
 }
 
 // conta quantas colunas o texto ocupa (letra com acento conta 1)
-static int larguraUtf8(const char *s)
-{
+static int larguraUtf8(const char *s){
     int n = 0;
     int i = 0;
     while (s[i] != '\0') {
@@ -93,8 +87,7 @@ static int larguraUtf8(const char *s)
 }
 
 // escreve texto colorido numa posicao (funciona como printf)
-void escrever(int x, int y, int cor, const char *fmt, ...)
-{
+void escrever(int x, int y, int cor, const char *fmt, ...){
     char texto[256];
     va_list args;
     va_start(args, fmt);
@@ -107,8 +100,7 @@ void escrever(int x, int y, int cor, const char *fmt, ...)
 }
 
 // escreve texto colorido no meio da linha y
-void centro(int y, int cor, const char *fmt, ...)
-{
+void centro(int y, int cor, const char *fmt, ...){
     char texto[256];
     va_list args;
     va_start(args, fmt);
@@ -126,8 +118,7 @@ void centro(int y, int cor, const char *fmt, ...)
 }
 
 // pinta o terminal inteiro com a cor de fundo
-void limparTela(void)
-{
+void limparTela(void){
     screenSetColor(TXT, FUNDO);
     screenClear();
     for (int linha = 1; linha <= 24; linha++) {
@@ -139,8 +130,7 @@ void limparTela(void)
 }
 
 // espera apertar Enter ou Espaco
-void esperarEnter(void)
-{
+void esperarEnter(void){
     limparTeclado();
     while (1) {
         int t = lerTecla();
@@ -158,8 +148,7 @@ void esperarEnter(void)
 /* ================= SECAO 2 - TELA DE PIXELS (Pessoa A) ================= */
 
 // cria a matriz de pixels
-Tela *telaCriar(int larg, int alt)
-{
+Tela *telaCriar(int larg, int alt){
     Tela *t = xmalloc(sizeof(Tela));
     t->larg = larg;
     t->alt = alt;
@@ -172,8 +161,7 @@ Tela *telaCriar(int larg, int alt)
 }
 
 // libera na ordem contraria -> linhas, vetor, struct
-void telaLiberar(Tela *t)
-{
+void telaLiberar(Tela *t){
     if (t == NULL) {
         return;
     }
@@ -185,16 +173,14 @@ void telaLiberar(Tela *t)
 }
 
 // zera todos os pixels
-void telaLimpar(Tela *t)
-{
+void telaLimpar(Tela *t){
     for (int y = 0; y < t->alt; y++) {
         memset(t->m[y], 0, t->larg);
     }
 }
 
 // liga um pixel (ignora se estiver fora da tela)
-void telaPut(Tela *t, int x, int y, int v)
-{
+void telaPut(Tela *t, int x, int y, int v){
     if (x < 0 || y < 0 || x >= t->larg || y >= t->alt) {
         return;
     }
@@ -202,8 +188,7 @@ void telaPut(Tela *t, int x, int y, int v)
 }
 
 // desenha um sprite -> cada # vira um pixel
-void telaSprite(Tela *t, int x, int yTopo, const Sprite *s, int v)
-{
+void telaSprite(Tela *t, int x, int yTopo, const Sprite *s, int v){
     for (int linha = 0; linha < s->h; linha++) {
         for (int coluna = 0; coluna < s->w; coluna++) {
             if (s->r[linha][coluna] == '#') {
@@ -214,8 +199,7 @@ void telaSprite(Tela *t, int x, int yTopo, const Sprite *s, int v)
 }
 
 // transforma a matriz em caracteres e mostra no terminal
-void telaDesenhar(const Tela *t, int corJoia)
-{
+void telaDesenhar(const Tela *t, int corJoia){
     screenSetColor(TXT, FUNDO);
 
     for (int cy = 0; cy < t->alt / 2; cy++) {
@@ -246,8 +230,7 @@ void telaDesenhar(const Tela *t, int corJoia)
 }
 
 // diz se o pixel (x, y) do sprite esta ligado
-static int pix(const Sprite *s, int x, int y)
-{
+static int pix(const Sprite *s, int x, int y){
     if (y >= s->h || x >= s->w) {
         return 0;
     }
@@ -255,8 +238,7 @@ static int pix(const Sprite *s, int x, int y)
 }
 
 // mostra um sprite direto no terminal (usado nos menus)
-void spritePreview(int x, int y, const Sprite *s, int cor)
-{
+void spritePreview(int x, int y, const Sprite *s, int cor){
     screenSetColor(cor, FUNDO);
     for (int cy = 0; cy < (s->h + 1) / 2; cy++) {
         screenGotoxy(x, y + cy);
@@ -272,9 +254,7 @@ void spritePreview(int x, int y, const Sprite *s, int cor)
 
 
 /* ================= SECAO 3 - MUNDO (Pessoa B) ================= */
-Entidade *entidadeNova(TipoEnt tipo, double x, int alt, int w, int h,
-                       int valor, const Sprite *const *sp)
-{
+Entidade *entidadeNova(TipoEnt tipo, double x, int alt, int w, int h, int valor, const Sprite *const *sp){
     Entidade *e = xmalloc(sizeof *e);
     e->tipo = tipo; e->x = x; e->alt = alt; e->w = w; e->h = h; e->valor = valor;
     e->spr[0] = sp[0];
@@ -283,26 +263,22 @@ Entidade *entidadeNova(TipoEnt tipo, double x, int alt, int w, int h,
     return e;
 }
 
-void listaInserir(Entidade **lista, Entidade *novo)
-{
+void listaInserir(Entidade **lista, Entidade *novo){
     novo->prox = *lista;
     *lista = novo;
 }
 
-void listaLiberar(Entidade **lista)
-{
+void listaLiberar(Entidade **lista){
     Entidade *e = *lista;
     while (e) { Entidade *p = e->prox; free(e); e = p; }
     *lista = NULL;
 }
 
-int pontosTotais(const Jogo *j)
-{
+int pontosTotais(const Jogo *j){
     return (int)j->metros + j->fragTotal * 10 + j->nJoias * 500 + j->bonus;
 }
 
-int colide(const Jogador *p, const Entidade *e)
-{
+int colide(const Jogador *p, const Entidade *e){
     int ini = (int)floor(e->x), fim = ini + e->w - 1;
     if (e->tipo == OBSTACULO) { ini++; fim--; }          /* hitbox um pouco menor */
     if (ini > PX + 6 || fim < PX + 2) return 0;          /* horizontal */
@@ -311,20 +287,17 @@ int colide(const Jogador *p, const Entidade *e)
     return ra < e->alt + e->h && e->alt < ra + ph;       /* vertical */
 }
 
-void criarObstaculo(Jogo *j, const Modelo *m, double x)
-{
+void criarObstaculo(Jogo *j, const Modelo *m, double x){
     listaInserir(&j->lista,
         entidadeNova(OBSTACULO, x, m->alt, m->spr[0]->w, m->spr[0]->h, 2, m->spr));
 }
 
-void criarTrilha(Jogo *j, double x, int alt, int qtd)
-{
+void criarTrilha(Jogo *j, double x, int alt, int qtd){
     for (int i = 0; i < qtd; i++)
         listaInserir(&j->lista, entidadeNova(FRAGMENTO, x + i * 5, alt, 3, 3, 3, PAR_FRAG));
 }
 
-void spawnEvento(Jogo *j, const Fase *f)
-{
+void spawnEvento(Jogo *j, const Fase *f){
     double x = LARG;
     int meta = j->fragFase >= f->meta;
 
@@ -354,8 +327,7 @@ void spawnEvento(Jogo *j, const Fase *f)
 }
 
 /* move o mundo e trata colisoes; retorna 1 se pegou a joia */
-int atualizarMundo(Jogo *j, const Fase *f, double v)
-{
+int atualizarMundo(Jogo *j, const Fase *f, double v){
     int pegouJoia = 0;
     Entidade **pp = &j->lista;          /* ponteiro para o ponteiro: remove qualquer no */
     while (*pp) {
@@ -386,8 +358,7 @@ int atualizarMundo(Jogo *j, const Fase *f, double v)
     return pegouJoia;
 }
 
-void atualizarJogador(Jogador *p)
-{
+void atualizarJogador(Jogador *p){
     if (!p->noChao) {
         p->altura += p->vy;
         p->vy -= GRAV;
@@ -404,8 +375,7 @@ void atualizarJogador(Jogador *p)
 // cria um no novo e coloca ele ja na posicao certa (maior pontuacao primeiro)
 // devolve a cabeca da lista (ela muda se o novo for o maior)
 // novoOut devolve o no criado (para destacar na tela). pode ser NULL
-Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score **novoOut)
-{
+Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score **novoOut){
     Score *novo = xmalloc(sizeof(Score));
     snprintf(novo->nome, sizeof novo->nome, "%s", nome);
     novo->pontos = pontos;
@@ -433,8 +403,7 @@ Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score
 }
  
 // le o arquivo e monta a lista ordenada. se o arquivo nao existe, devolve lista vazia
-Score *rankingCarregar(const char *arq)
-{
+Score *rankingCarregar(const char *arq){
     FILE *f = fopen(arq, "r");
     if (f == NULL) {
         return NULL;
@@ -453,8 +422,7 @@ Score *rankingCarregar(const char *arq)
 }
  
 // grava os MAX_RANK melhores no arquivo (o "w" apaga o conteudo antigo)
-void rankingSalvar(const Score *lista, const char *arq)
-{
+void rankingSalvar(const Score *lista, const char *arq){
     FILE *f = fopen(arq, "w");
     if (f == NULL) {
         return;
@@ -469,8 +437,7 @@ void rankingSalvar(const Score *lista, const char *arq)
 }
  
 // libera todos os nos
-void rankingLiberar(Score *lista)
-{
+void rankingLiberar(Score *lista){
     while (lista != NULL) {
         Score *prox = lista->prox;   // guarda o proximo ANTES do free
         free(lista);
@@ -479,8 +446,7 @@ void rankingLiberar(Score *lista)
 }
 
 // desenha a tabela. o no 'destaque' (pode ser NULL) aparece em vermelho
-void rankingMostrar(const Score *lista, const Score *destaque)
-{
+void rankingMostrar(const Score *lista, const Score *destaque){
     centro(4, TXT, "RANKING");
     escrever(22, 6, SUAVE, "POS  NOME           PONTOS  JOIAS");
  
@@ -504,8 +470,7 @@ void rankingMostrar(const Score *lista, const Score *destaque)
 
 /* ================= SECAO 5 - MENUS E TELAS (Pessoa D) ================= */
 // carrega o ranking, mostra, libera e espera Enter
-void telaRanking(void)
-{
+void telaRanking(void){
     Score *r = rankingCarregar(ARQ_SCORES);
  
     limparTela();
@@ -519,8 +484,7 @@ void telaRanking(void)
  
 // le o nome tecla por tecla (letras, numeros e hifen; Backspace apaga)
 // dest precisa ter espaco para max + 1 caracteres
-void lerNome(char *dest, int max, int x, int y)
-{
+void lerNome(char *dest, int max, int x, int y){
     int n = 0;
     dest[0] = '\0';
     limparTeclado();
@@ -554,8 +518,7 @@ void lerNome(char *dest, int max, int x, int y)
 }
  
 // tela que aparece antes de cada fase
-void telaIntroFase(const Fase *f, int idx)
-{
+void telaIntroFase(const Fase *f, int idx){
     limparTela();
     centro(5, f->cor, "FASE %d  -  %s", idx + 1, f->cenario);
     centro(7, TXT, "%s", f->joia);
@@ -568,8 +531,7 @@ void telaIntroFase(const Fase *f, int idx)
 }
 
 // tela que aparece quando pega a joia da fase
-void telaJoiaConquistada(const Jogo *j, int idx)
-{
+void telaJoiaConquistada(const Jogo *j, int idx){
     const Fase *f = &FASES[idx];
  
     limparTela();
@@ -582,8 +544,7 @@ void telaJoiaConquistada(const Jogo *j, int idx)
 }
  
 // fim da partida: mostra resultado, pede o nome, salva e mostra o ranking
-void fimDeJogo(Jogo *j, int venceu, int ultimaFase)
-{
+void fimDeJogo(Jogo *j, int venceu, int ultimaFase){
     limparTela();
     if (venceu) {
         centro(5, GREEN, "Voce reuniu as 6 Joias do Infinito!");
@@ -624,8 +585,7 @@ void fimDeJogo(Jogo *j, int venceu, int ultimaFase)
 }
 
 // menu principal. devolve 1 (jogar), 2 (ranking), 3 (como jogar) ou 4 (sair)
-int menuPrincipal(void)
-{
+int menuPrincipal(void){
     limparTela();
     centro(5, TXT, "A V E N G E R S    R U N");
     centro(7, SUAVE, "Fuja de Thanos e reuna as 6 Joias do Infinito");
@@ -646,8 +606,7 @@ int menuPrincipal(void)
 }
  
 // escolha do personagem. devolve 0 (homem), 1 (mulher) ou -1 (voltar)
-int escolherPersonagem(void)
-{
+int escolherPersonagem(void){
     limparTela();
     centro(4, TXT, "Escolha seu personagem");
     for (int p = 0; p < 2; p++) {
@@ -925,8 +884,7 @@ static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
 /* ================= SECAO 7 - JOGARPARTIDA E MAIN (todos) ================= */
 
 // roda as 6 fases em sequencia e chama o fim de jogo
-void jogarPartida(Jogo *j, int sexo)
-{
+void jogarPartida(Jogo *j, int sexo){
     int venceu = 0;
     int ultima = 0;
  
@@ -969,8 +927,7 @@ void jogarPartida(Jogo *j, int sexo)
 }
  
 #ifndef SEM_MAIN
-int main(void)
-{
+int main(void){
     srand((unsigned)time(NULL));
     screenInit(0);
     keyboardInit();
