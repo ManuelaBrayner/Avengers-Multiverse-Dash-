@@ -375,23 +375,24 @@ void atualizarJogador(Jogador *p){
 // cria um no novo e coloca ele ja na posicao certa (maior pontuacao primeiro)
 // devolve a cabeca da lista (ela muda se o novo for o maior)
 // novoOut devolve o no criado (para destacar na tela). pode ser NULL
-Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score **novoOut){
+Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score **novoOut)
+{
     Score *novo = xmalloc(sizeof(Score));
     snprintf(novo->nome, sizeof novo->nome, "%s", nome);
     novo->pontos = pontos;
     novo->joias = joias;
     novo->prox = NULL;
- 
+
     if (novoOut != NULL) {
         *novoOut = novo;
     }
- 
+
     // lista vazia ou novo e o maior de todos: vira a cabeca
     if (ini == NULL || pontos > ini->pontos) {
         novo->prox = ini;
         return novo;
     }
- 
+
     // senao anda ate o ultimo que tem pontos >= (no empate, quem ja estava fica na frente)
     Score *atual = ini;
     while (atual->prox != NULL && atual->prox->pontos >= pontos) {
@@ -401,18 +402,19 @@ Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score
     atual->prox = novo;
     return ini;
 }
- 
+
 // le o arquivo e monta a lista ordenada. se o arquivo nao existe, devolve lista vazia
-Score *rankingCarregar(const char *arq){
+Score *rankingCarregar(const char *arq)
+{
     FILE *f = fopen(arq, "r");
     if (f == NULL) {
         return NULL;
     }
- 
+
     Score *lista = NULL;
-    char nome[32];
+    char nome[16];
     int pontos, joias;
- 
+
     // %15s -> no maximo 15 letras, porque nome[16] precisa do '\0'
     while (fscanf(f, "%15s %d %d", nome, &pontos, &joias) == 3) {
         lista = rankingInserir(lista, nome, pontos, joias, NULL);
