@@ -424,12 +424,13 @@ Score *rankingCarregar(const char *arq)
 }
  
 // grava os MAX_RANK melhores no arquivo (o "w" apaga o conteudo antigo)
-void rankingSalvar(const Score *lista, const char *arq){
+void rankingSalvar(const Score *lista, const char *arq)
+{
     FILE *f = fopen(arq, "w");
     if (f == NULL) {
         return;
     }
- 
+
     int n = 0;
     for (const Score *s = lista; s != NULL && n < MAX_RANK; s = s->prox) {
         fprintf(f, "%s %d %d\n", s->nome, s->pontos, s->joias);
@@ -437,9 +438,10 @@ void rankingSalvar(const Score *lista, const char *arq){
     }
     fclose(f);
 }
- 
+
 // libera todos os nos
-void rankingLiberar(Score *lista){
+void rankingLiberar(Score *lista)
+{
     while (lista != NULL) {
         Score *prox = lista->prox;   // guarda o proximo ANTES do free
         free(lista);
@@ -448,10 +450,11 @@ void rankingLiberar(Score *lista){
 }
 
 // desenha a tabela. o no 'destaque' (pode ser NULL) aparece em vermelho
-void rankingMostrar(const Score *lista, const Score *destaque){
+void rankingMostrar(const Score *lista, const Score *destaque)
+{
     centro(4, TXT, "RANKING");
     escrever(22, 6, SUAVE, "POS  NOME           PONTOS  JOIAS");
- 
+
     int n = 0;
     for (const Score *s = lista; s != NULL && n < MAX_RANK; s = s->prox) {
         int cor = TXT;
@@ -462,7 +465,7 @@ void rankingMostrar(const Score *lista, const Score *destaque){
                  n + 1, s->nome, s->pontos, s->joias, NUM_FASES);
         n++;
     }
- 
+
     if (n == 0) {
         centro(9, SUAVE, "Nenhuma partida ainda.");
     }
