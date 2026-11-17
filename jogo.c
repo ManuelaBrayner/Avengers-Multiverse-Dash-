@@ -799,11 +799,6 @@ static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
 
 
 /* ================= SECAO 7 - JOGARPARTIDA E MAIN (todos) ================= */
-#ifndef SEM_MAIN
-int main(void)
-{
-    return 0;
-}
 
 // roda as 6 fases em sequencia e chama o fim de jogo
 void jogarPartida(Jogo *j, int sexo)
