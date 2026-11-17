@@ -43,6 +43,7 @@ Pegar fragmentos afasta Thanos um pouco. A velocidade aumenta ao longo de cada f
 `metros percorridos + 10 por fragmento + 500 por joia + 2000 de bônus se pegar as 6 joias`
  
 Os 8 melhores resultados ficam salvos no arquivo `scores.txt`.
+- Com o nome do jogador e a quantidade de pontos feitos na partida jogada. 
  
 ## Controles
  
