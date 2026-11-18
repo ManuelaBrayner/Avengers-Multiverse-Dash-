@@ -149,6 +149,7 @@ Cada célula do terminal mostra **2 pixels na vertical**, usando os caracteres e
 - Dividir o `jogo.c` em módulos (`.c` e `.h`), um por seção.
 - Mais obstáculos por fase e modo para dois jogadores.
 - Guardar mais informações no ranking (data e personagem).
+- Criar depois página em HTML para melhorar a estética do cenário, personagens e elementos
 ## Equipe:
 | Nome Completo | E-mail Institucional |
 |---|---|
