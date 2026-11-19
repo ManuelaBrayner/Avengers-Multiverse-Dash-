@@ -14,6 +14,7 @@
 #include "dados.h"
 
 
+// UTILITÁRIOS
 void *xmalloc(size_t n){
     void *p = malloc(n);
     if (p == NULL) {
