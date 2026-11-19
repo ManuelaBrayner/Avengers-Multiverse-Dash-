@@ -238,7 +238,7 @@ void spritePreview(int x, int y, const Sprite *s, int cor){
         }
     }
 }
-
+/* ================= FIM DA SECAO 2 ================= */
 
 /* ================= SECAO 3 - MUNDO ================= */
 
@@ -318,7 +318,7 @@ void spawnEvento(Jogo *j, const Fase *f){
 int atualizarMundo(Jogo *j, const Fase *f, double v){
     int pegouJoia = 0;
     Entidade **pp = &j->lista;          
-    
+
     while (*pp) {
         Entidade *e = *pp;
         int remover = 0;
