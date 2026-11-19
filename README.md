@@ -10,11 +10,11 @@ Projeto em **C** com a biblioteca **cli-lib**, feito em equipe para a disciplina
  
 | Integrante | Responsabilidade |
 |---|---|
-| A – Maria Júlia Dionísio | Utilitários e tela de pixels (seções 1 e 2 do `jogo.c`), `tipos.h` e Makefile |
-| B – Milena Araújo | Mundo, lista de entidades, colisão e spawn (seção 3) |
-| C – Rafaela Dubeux | Sprites, fases e laço do jogo (`dados.h` e seção 6) |
-| D – Manuela Brayner | Ranking, menus e documentação (seções 4 e 5, README) |
-| Todos | Integração (seção 7: `jogarPartida` e `main`), balanceamento e testes |
+| A – Maria Júlia Dionísio | Utilitários e tela de pixels e Makefile |
+| B – Milena Araújo | Mundo, lista de entidades, colisão e spawn |
+| C – Rafaela Dubeux | Sprites, fases e laço do jogo |
+| D – Manuela Brayner | Ranking, menus e documentação |
+| Todos | Integração, balanceamento e testes |
 
 ## Vídeo do jogo sendo executado
 link: https://youtu.be/fWvKR1x_70o
