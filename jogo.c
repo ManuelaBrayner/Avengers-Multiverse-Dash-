@@ -242,7 +242,6 @@ void spritePreview(int x, int y, const Sprite *s, int cor){
 }
 
 
-
 // MUNDO
 Entidade *entidadeNova(TipoEnt tipo, double x, int alt, int w, int h, int valor, const Sprite *const *sp){
     Entidade *e = xmalloc(sizeof *e);
@@ -360,7 +359,6 @@ void atualizarJogador(Jogador *p){
 }
 
 
-
 // RANKING 
 Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score **novoOut){
     Score *novo = xmalloc(sizeof(Score));
@@ -373,12 +371,10 @@ Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score
         *novoOut = novo;
     }
 
-   
     if (ini == NULL || pontos > ini->pontos) {
         novo->prox = ini;
         return novo;
     }
-
     
     Score *atual = ini;
     while (atual->prox != NULL && atual->prox->pontos >= pontos) {
@@ -452,7 +448,6 @@ void rankingMostrar(const Score *lista, const Score *destaque){
         centro(9, SUAVE, "Nenhuma partida ainda.");
     }
 }
-
 
 
 // MENUS E TELAS 
@@ -624,7 +619,6 @@ void telaComoJogar(void){
 }
 
 
-
 // DESENHO E FASE 
 static void desenharJogo(Jogo *j, const Fase *f){ 
     Tela *t = j->tela;
@@ -667,7 +661,6 @@ static void desenharJogo(Jogo *j, const Fase *f){
     }
     telaDesenhar(t, f->cor);
 }
-
 
 static void desenharHud(const Jogo *j, const Fase *f, int idx){ 
     int pts = pontosTotais(j);
@@ -736,7 +729,6 @@ static void desenharHud(const Jogo *j, const Fase *f, int idx){
         }
     }
 }
-
 
 static int jogarFase(Jogo *j, int idx){ 
     const Fase *f = &FASES[idx];
@@ -837,7 +829,6 @@ static int jogarFase(Jogo *j, int idx){
     listaLiberar(&j->lista);
     return resultado; 
 }
-
 
 
 // JOGAR PARTIDA E MAIN 
