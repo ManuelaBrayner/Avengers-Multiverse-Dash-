@@ -361,9 +361,6 @@ void atualizarJogador(Jogador *p){
 
 
 /* ================= SECAO 4 - RANKING ================= */
-// cria um no novo e coloca ele ja na posicao certa (maior pontuacao primeiro)
-// devolve a cabeca da lista (ela muda se o novo for o maior)
-// novoOut devolve o no criado (para destacar na tela). pode ser NULL
 Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score **novoOut)
 {
     Score *novo = xmalloc(sizeof(Score));
@@ -376,13 +373,13 @@ Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score
         *novoOut = novo;
     }
 
-    // lista vazia ou novo e o maior de todos: vira a cabeca
+   
     if (ini == NULL || pontos > ini->pontos) {
         novo->prox = ini;
         return novo;
     }
 
-    // senao anda ate o ultimo que tem pontos >= (no empate, quem ja estava fica na frente)
+    
     Score *atual = ini;
     while (atual->prox != NULL && atual->prox->pontos >= pontos) {
         atual = atual->prox;
@@ -392,7 +389,7 @@ Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score
     return ini;
 }
 
-// le o arquivo e monta a lista ordenada. se o arquivo nao existe, devolve lista vazia
+
 Score *rankingCarregar(const char *arq)
 {
     FILE *f = fopen(arq, "r");
@@ -404,7 +401,7 @@ Score *rankingCarregar(const char *arq)
     char nome[16];
     int pontos, joias;
 
-    // %15s -> no maximo 15 letras, porque nome[16] precisa do '\0'
+    
     while (fscanf(f, "%15s %d %d", nome, &pontos, &joias) == 3) {
         lista = rankingInserir(lista, nome, pontos, joias, NULL);
     }
@@ -412,7 +409,7 @@ Score *rankingCarregar(const char *arq)
     return lista;
 }
  
-// grava os MAX_RANK melhores no arquivo (o "w" apaga o conteudo antigo)
+
 void rankingSalvar(const Score *lista, const char *arq)
 {
     FILE *f = fopen(arq, "w");
@@ -428,17 +425,17 @@ void rankingSalvar(const Score *lista, const char *arq)
     fclose(f);
 }
 
-// libera todos os nos
+
 void rankingLiberar(Score *lista)
 {
     while (lista != NULL) {
-        Score *prox = lista->prox;   // guarda o proximo ANTES do free
+        Score *prox = lista->prox;   
         free(lista);
         lista = prox;
     }
 }
 
-// desenha a tabela. o no 'destaque' (pode ser NULL) aparece em vermelho
+
 void rankingMostrar(const Score *lista, const Score *destaque)
 {
     centro(4, TXT, "RANKING");
@@ -462,8 +459,7 @@ void rankingMostrar(const Score *lista, const Score *destaque)
 
 
 /* ================= SECAO 5 - MENUS E TELAS ================= */
-// carrega o ranking, mostra, libera e espera Enter
-// carrega o ranking, mostra, libera e espera Enter
+
 void telaRanking(void)
 {
     Score *r = rankingCarregar(ARQ_SCORES);
@@ -477,8 +473,7 @@ void telaRanking(void)
     esperarEnter();
 }
 
-// le o nome tecla por tecla (letras, numeros e hifen; Backspace apaga)
-// dest precisa ter espaco para max + 1 caracteres
+
 void lerNome(char *dest, int max, int x, int y)
 {
     int n = 0;
@@ -486,7 +481,7 @@ void lerNome(char *dest, int max, int x, int y)
     limparTeclado();
 
     while (1) {
-        // mostra o nome com '_' de cursor (o espaco no fim apaga a letra apagada)
+    
         escrever(x, y, TXT, "%s_ ", dest);
         screenUpdate();
 
@@ -495,10 +490,10 @@ void lerNome(char *dest, int max, int x, int y)
             usleep(10000);
         }
 
-        if (t == 10 || t == 13) {                       // Enter termina
+        if (t == 10 || t == 13) {                       
             break;
         }
-        if ((t == 127 || t == 8) && n > 0) {            // Backspace apaga
+        if ((t == 127 || t == 8) && n > 0) {            
             n--;
             dest[n] = '\0';
         } else if (t > 0 && t < 128 && n < max && (isalnum(t) || t == '-')) {
@@ -513,7 +508,7 @@ void lerNome(char *dest, int max, int x, int y)
     }
 }
  
-// tela que aparece antes de cada fase
+
 void telaIntroFase(const Fase *f, int idx)
 {
     limparTela();
@@ -527,7 +522,7 @@ void telaIntroFase(const Fase *f, int idx)
     esperarEnter();
 }
 
-// tela que aparece quando pega a joia da fase
+
 void telaJoiaConquistada(const Jogo *j, int idx)
 {
     const Fase *f = &FASES[idx];
@@ -541,10 +536,10 @@ void telaJoiaConquistada(const Jogo *j, int idx)
     esperarEnter();
 }
 
-// fim da partida: mostra resultado, pede o nome, salva e mostra o ranking
+
 void fimDeJogo(Jogo *j)
 {
-    int venceu = (j->nJoias == NUM_FASES);   // pegou as 6 joias = venceu
+    int venceu = (j->nJoias == NUM_FASES);   
 
     limparTela();
     if (venceu) {
@@ -552,7 +547,7 @@ void fimDeJogo(Jogo *j)
         j->bonus = 2000;
     } else {
         centro(5, RED, "Thanos te alcancou!");
-        centro(6, SUAVE, "Fase %d: %s", j->nJoias + 1, FASES[j->nJoias].cenario);   // perdeu na fase seguinte as joias que tem
+        centro(6, SUAVE, "Fase %d: %s", j->nJoias + 1, FASES[j->nJoias].cenario);   
     }
     centro(9, TXT, "Pontos: %d    Joias: %d/%d", pontosTotais(j), j->nJoias, NUM_FASES);
     centro(12, TXT, "Seu nome (ate 12 letras) e ENTER:");
@@ -561,7 +556,7 @@ void fimDeJogo(Jogo *j)
     char nome[16];
     lerNome(nome, 12, 34, 14);
 
-    // carrega, insere o novo, salva (so os 8 melhores vao pro arquivo)
+    
     Score *r = rankingCarregar(ARQ_SCORES);
     Score *novo = NULL;
     r = rankingInserir(r, nome, pontosTotais(j), j->nJoias, &novo);
@@ -576,7 +571,7 @@ void fimDeJogo(Jogo *j)
     esperarEnter();
 }
 
-// menu principal. devolve 1 (jogar), 2 (ranking), 3 (como jogar) ou 4 (sair)
+
 int menuPrincipal(void)
 {
     limparTela();
@@ -598,7 +593,7 @@ int menuPrincipal(void)
     }
 }
 
-// escolha do personagem. devolve 0 (homem), 1 (mulher) ou -1 (voltar)
+
 int escolherPersonagem(void)
 {
     limparTela();
@@ -621,7 +616,7 @@ int escolherPersonagem(void)
     }
 }
  
-// regras e controles
+
 void telaComoJogar(void)
 {
     limparTela();
@@ -858,7 +853,6 @@ static int jogarFase(Jogo *j, int idx){
 
 
 /* ================= SECAO 7 - JOGARPARTIDA E MAIN ================= */
-// roda as 6 fases em sequencia e chama o fim de jogo
 void jogarPartida(Jogo *j, int sexo)
 {
     j->sexo = sexo;
@@ -868,7 +862,7 @@ void jogarPartida(Jogo *j, int sexo)
     j->bonus = 0;
     memset(j->joias, 0, sizeof j->joias);
 
-    // o recorde (HI) e o primeiro do ranking
+    
     Score *r = rankingCarregar(ARQ_SCORES);
     if (r != NULL) {
         j->recorde = r->pontos;
@@ -881,10 +875,10 @@ void jogarPartida(Jogo *j, int sexo)
         int res = jogarFase(j, i);
 
         if (res < 0) {
-            return;                 // saiu: volta ao menu sem salvar
+            return;                 
         }
         if (res == 0) {
-            break;                  // Thanos alcancou
+            break;                 
         }
         j->joias[i] = 1;
         j->nJoias++;
