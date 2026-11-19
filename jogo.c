@@ -138,8 +138,7 @@ void esperarEnter(void){
 }
 
 
-
-
+// TELA
 Tela *telaCriar(int larg, int alt){
     Tela *t = xmalloc(sizeof(Tela));
     t->larg = larg;
