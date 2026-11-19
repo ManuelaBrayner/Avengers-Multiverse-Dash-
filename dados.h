@@ -5,7 +5,6 @@
 
 static const char *const BLK[4] = { " ", "\xe2\x96\x80", "\xe2\x96\x84", "\xe2\x96\x88" };
 
-
 #define HOMEM_CORPO  "..###....",".#####...",".#####...","..###....",".#####...","#.###.#..","#.###.#..","..###....","..###...."
 #define MULHER_CORPO "..###....","#.#####..","#..###...","..###....",".#####...","#.###.#..","#.###.#..",".#####...","#######.."
 #define PERNAS_A     "..#.#....","..#.#....",".##.##..."
@@ -49,8 +48,8 @@ static const Sprite SPR_JOG[2][4] = {
 static const char *NOME_JOGADOR[2] = { "HEROI", "HEROINA" };
 
 #define THANOS_CORPO "....######....","...########...","...########...","...#.####.#...","...########...","....######....","..##########..",".############.","##.########.##","##.########.##","##.########.##","##.########.##","##..######..##","....######...."
-static const Sprite SPR_THANOS[2] = {
 
+static const Sprite SPR_THANOS[2] = {
   {14,18,{THANOS_CORPO,"....##..##....","....##..##....","...###..###...","...###..###..."}},
   {14,18,{THANOS_CORPO,"...##....##...","...##....##...","..###....###..","..###....###.."}}
 
@@ -66,9 +65,9 @@ static const Sprite SP_CORVO_B = {12,6,{"............","............","#########
 static const Sprite SP_FRAG = {3,3, {".#.","###",".#."}}; 
 static const Sprite SP_JOIA = {7,7,{"...#...","..###..",".#####.","#######",".#####.","..###..","...#..."}};
 
+
 static const Sprite *const PAR_FRAG[2] = { &SP_FRAG, NULL };
 static const Sprite *const PAR_JOIA[2] = { &SP_JOIA, NULL };
-
 
 
 static const Fase FASES[NUM_FASES] = {
@@ -109,6 +108,5 @@ static const Fase FASES[NUM_FASES] = {
     LIGHTRED, 2.20, 28, 17, 12, 34, 32, 8.0,
     { {"Rochas", {&SP_PEDRA, NULL}, 0}, {"Espectro", {&SP_ROBO, NULL}, 0}, {"Corvo", {&SP_CORVO_A, &SP_CORVO_B}, VOO} } } 
 };
-
 
 #endif
