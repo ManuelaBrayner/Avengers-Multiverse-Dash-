@@ -648,7 +648,6 @@ static void desenharJogo(Jogo *j, const Fase *f){
     telaLimpar(t);
 
     int valor_oh = (int)j->offChao; 
-
     for (int i = 0; i < LARG; i++) { 
         if (((unsigned int)(valor_oh + i) * 2654435761u >> 16) % 23 == 0){ 
             telaPut(t, i, GL + 2, 2);
@@ -656,7 +655,6 @@ static void desenharJogo(Jogo *j, const Fase *f){
     }
 
     int quadro = (int)((j->frame / 4) % 2); 
-
     for (const Entidade *e = j->lista; e; e = e->prox) {
         const Sprite *s; 
         if (e->spr[1] && quadro){
@@ -762,8 +760,8 @@ static int jogarFase(Jogo *j, int idx){
     int resultado = -2, pausado = 0; 
 
     telaIntroFase(f, idx);
-
     listaLiberar(&j->lista);
+
     j->jog = (Jogador){ .sexo = j->sexo, .noChao = 1 }; 
     j->th.dist = f->distIni; 
     j->fragFase = 0;  
@@ -807,7 +805,6 @@ static int jogarFase(Jogo *j, int idx){
             break;
         }
 
-    
         if (timerTimeOver() && !pausado) { 
             int frags;
             if (j->fragFase > f->meta) {
@@ -817,9 +814,9 @@ static int jogarFase(Jogo *j, int idx){
             }
             double prog = (double)frags / f->meta;
             double v = f->vel * (1.0 + 0.25 * prog); 
-
            
             atualizarJogador(&j->jog);
+
             if (atualizarMundo(j, f, v)) { 
                 resultado = 1; 
             } else {
@@ -839,7 +836,6 @@ static int jogarFase(Jogo *j, int idx){
                 } 
             }
 
-            
             if(resultado == -2) {
                 j->offChao += v;  
                 j->metros += v * 0.25;  
