@@ -137,7 +137,7 @@ void esperarEnter(void){
 }
 
 
-
+---
 
 Tela *telaCriar(int larg, int alt){
     Tela *t = xmalloc(sizeof(Tela));
@@ -360,7 +360,7 @@ void atualizarJogador(Jogador *p){
 
 
 
-/* ================= SECAO 4 - RANKING (Pessoa D) ================= */
+/* ================= SECAO 4 - RANKING ================= */
 // cria um no novo e coloca ele ja na posicao certa (maior pontuacao primeiro)
 // devolve a cabeca da lista (ela muda se o novo for o maior)
 // novoOut devolve o no criado (para destacar na tela). pode ser NULL
@@ -461,7 +461,7 @@ void rankingMostrar(const Score *lista, const Score *destaque)
 }
 
 
-/* ================= SECAO 5 - MENUS E TELAS (Pessoa D) ================= */
+/* ================= SECAO 5 - MENUS E TELAS ================= */
 // carrega o ranking, mostra, libera e espera Enter
 // carrega o ranking, mostra, libera e espera Enter
 void telaRanking(void)
