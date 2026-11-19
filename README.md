@@ -1,8 +1,10 @@
 # Avengers: Multiverse Dash
 
 # Avengers Run
- 
-Jogo de corrida lateral no terminal, inspirada no jogo "Subway Surf" e no "jogo do dinossauro". Fuja de **Thanos**, desvie dos obstáculos e junte as **6 Joias do Infinito**, uma por fase.
+
+Jogo de corrida lateral que roda no terminal, inspirado nos jogos "Subway Surf" e "jogo do dinossauro", com uma estética inspirada nos filmes dos Vingadores, da Marvel. O jogador percorre diferentes cenários, que correspondem a cada nível, coletando as Joias do Infinito e enfrentando desafios com dificuldade progressiva ao longo da partida.
+
+Fuja de **Thanos**, desvie dos obstáculos e junte as **6 Joias do Infinito**, uma por fase.
  
 Projeto em **C** com a biblioteca **cli-lib**, feito em equipe para a disciplina de Programação Imperativa e Funcional.
  
