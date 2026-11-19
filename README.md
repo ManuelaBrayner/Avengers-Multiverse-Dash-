@@ -2,7 +2,7 @@
 
 # Avengers Run
  
-Jogo de corrida lateral no terminal, estilo "jogo do dinossauro". Fuja de **Thanos**, desvie dos obstáculos e junte as **6 Joias do Infinito**, uma por fase.
+Jogo de corrida lateral no terminal, inspirada no jogo "Subway Surf" e no "jogo do dinossauro". Fuja de **Thanos**, desvie dos obstáculos e junte as **6 Joias do Infinito**, uma por fase.
  
 Projeto em **C** com a biblioteca **cli-lib**, feito em equipe para a disciplina de Programação Imperativa e Funcional.
  
@@ -15,6 +15,9 @@ Projeto em **C** com a biblioteca **cli-lib**, feito em equipe para a disciplina
 | C – Rafaela Dubeux | Sprites, fases e laço do jogo (`dados.h` e seção 6) |
 | D – Manuela Brayner | Ranking, menus e documentação (seções 4 e 5, README) |
 | Todos | Integração (seção 7: `jogarPartida` e `main`), balanceamento e testes |
+
+## Vídeo do jogo sendo executado
+link: https://youtu.be/fWvKR1x_70o
 
  
 ## Como o jogo funciona
