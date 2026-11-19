@@ -238,9 +238,10 @@ void spritePreview(int x, int y, const Sprite *s, int cor){
         }
     }
 }
+/* ================= FIM DA SECAO 2 ================= */
 
+/* ================= SECAO 3 - MUNDO ================= */
 
-/* ================= SECAO 3 - MUNDO (Pessoa B) ================= */
 Entidade *entidadeNova(TipoEnt tipo, double x, int alt, int w, int h, int valor, const Sprite *const *sp){
     Entidade *e = xmalloc(sizeof *e);
     e->tipo = tipo; e->x = x; e->alt = alt; e->w = w; e->h = h; e->valor = valor;
@@ -267,11 +268,11 @@ int pontosTotais(const Jogo *j){
 
 int colide(const Jogador *p, const Entidade *e){
     int ini = (int)floor(e->x), fim = ini + e->w - 1;
-    if (e->tipo == OBSTACULO) { ini++; fim--; }          /* hitbox um pouco menor */
-    if (ini > PX + 6 || fim < PX + 2) return 0;          /* horizontal */
+    if (e->tipo == OBSTACULO) { ini++; fim--; }          
+    if (ini > PX + 6 || fim < PX + 2) return 0;         
     int ra = (int)(p->altura + 0.5);
-    int ph = (p->agachado > 0 && p->noChao) ? 7 : 11;    /* altura do jogador */
-    return ra < e->alt + e->h && e->alt < ra + ph;       /* vertical */
+    int ph = (p->agachado > 0 && p->noChao) ? 7 : 11;    
+    return ra < e->alt + e->h && e->alt < ra + ph;       
 }
 
 void criarObstaculo(Jogo *j, const Modelo *m, double x){
@@ -288,35 +289,36 @@ void spawnEvento(Jogo *j, const Fase *f){
     double x = LARG;
     int meta = j->fragFase >= f->meta;
 
-    if (meta && !j->joiaViva) {                           /* hora da joia */
+    if (meta && !j->joiaViva) {                          
         listaInserir(&j->lista, entidadeNova(JOIA, x, rnd(2) ? 16 : 2, 7, 7, 3, PAR_JOIA));
         j->joiaViva = 1;
         return;
     }
 
     int r = rnd(100);
-    if (r < f->pctVoador) {                               /* obstaculo voador */
+    if (r < f->pctVoador) {                              
         criarObstaculo(j, &f->mod[2], x);
         if (!meta) criarTrilha(j, x + 22, 3, 3);
-    } else if (r < f->pctVoador + 50 || meta) {           /* obstaculo no chao */
+    } else if (r < f->pctVoador + 50 || meta) {           
         const Modelo *m = &f->mod[rnd(2)];
         criarObstaculo(j, m, x);
         int lw = m->spr[0]->w;
-        if (rnd(100) < f->pctDupla) {                     /* obstaculo duplo */
+        if (rnd(100) < f->pctDupla) {                    
             const Modelo *m2 = &f->mod[rnd(2)];
             criarObstaculo(j, m2, x + lw + 4);
             lw += m2->spr[0]->w + 4;
         }
         if (!meta && rnd(100) < 75) criarTrilha(j, x + lw / 2 - 5, m->spr[0]->h + 3, 3);
-    } else {                                              /* so fragmentos */
+    } else {                                           
         criarTrilha(j, x, rnd(2) ? 16 : 3, 4);
     }
 }
 
-/* move o mundo e trata colisoes; retorna 1 se pegou a joia */
+
 int atualizarMundo(Jogo *j, const Fase *f, double v){
     int pegouJoia = 0;
-    Entidade **pp = &j->lista;          /* ponteiro para o ponteiro: remove qualquer no */
+    Entidade **pp = &j->lista;          
+
     while (*pp) {
         Entidade *e = *pp;
         int remover = 0;
