@@ -138,6 +138,7 @@ void esperarEnter(void){
 
 
 
+
 Tela *telaCriar(int larg, int alt){
     Tela *t = xmalloc(sizeof(Tela));
     t->larg = larg;
@@ -238,7 +239,7 @@ void spritePreview(int x, int y, const Sprite *s, int cor){
         }
     }
 }
-/* ================= FIM DA SECAO 2 ================= */
+
 
 /* ================= SECAO 3 - MUNDO ================= */
 
@@ -356,7 +357,6 @@ void atualizarJogador(Jogador *p){
     if (p->agachado > 0) p->agachado--;
     if (p->invul > 0) p->invul--;
 }
-/* ================= FIM DA SECAO 3 ================= */
 
 
 
@@ -459,7 +459,6 @@ void rankingMostrar(const Score *lista, const Score *destaque)
         centro(9, SUAVE, "Nenhuma partida ainda.");
     }
 }
-/* ================= FIM DA SECAO 4 ================= */
 
 
 /* ================= SECAO 5 - MENUS E TELAS (Pessoa D) ================= */
@@ -641,51 +640,44 @@ void telaComoJogar(void)
     esperarEnter();
 }
 
-/* ================= FIM DA SECAO 5 ================= */
 
 
-
-/* ================= SECAO 6 - DESENHO E FASE (Pessoa C) ================= */
-
-static void desenharJogo(Jogo *j, const Fase *f){ /*Cenário e personagens*/
-    /*Ponteiro para a tela virtual e apaga o quadro anterior, para começar do zero*/
+/* ================= SECAO 6 - DESENHO E FASE ================= */
+static void desenharJogo(Jogo *j, const Fase *f){ 
     Tela *t = j->tela;
     telaLimpar(t);
 
-    /* chao */
-    int valor_oh = (int)j->offChao; /*offChao é o deslocamento do chão e valor_oh é esse valor convertido pra inteiro*/
-    for (int i = 0; i < LARG; i++) { /*Percorre todas as colunas*/
-        if (((unsigned int)(valor_oh + i) * 2654435761u >> 16) % 23 == 0){ /*constante de hash de Knuth*/
+    int valor_oh = (int)j->offChao; 
+    for (int i = 0; i < LARG; i++) { 
+        if (((unsigned int)(valor_oh + i) * 2654435761u >> 16) % 23 == 0){ 
             telaPut(t, i, GL + 2, 2);
-        /*O if decide se aquela coluna ganha um detalhe extra (tipo uma pedrinha) duas linhas abaixo, em GL + 2*/
         }
     }
 
-    /* obstaculos, fragmentos e joia (percorre a lista) */
-    int quadro = (int)((j->frame / 4) % 2); /*Animação alterna a cada 4 quadros*/
+    int quadro = (int)((j->frame / 4) % 2); 
     for (const Entidade *e = j->lista; e; e = e->prox) {
         const Sprite *s; 
         if (e->spr[1] && quadro){
-            s = e->spr[1]; /*Se a entidade tem um segundo sprite e estamos no quadro 1, usa o segundo*/
+            s = e->spr[1]; 
         } else {
-            s = e->spr[0]; /* Senão usa o primeiro.*/
+            s = e->spr[0]; 
         }
         telaSprite(t, (int)floor(e->x), PES - e->alt - (s->h - 1), s, e->valor);
         /*PES é o nível do chão*/
     }
 
-    /* Thanos */
-    int dir = PX - 1 - (int)j->th.dist; /*dir é a coluna da borda direita do Thanos e PX é a coluna do jogador*/
-    telaSprite(t, dir - 13, PES - 17, &SPR_THANOS[(j->frame / 3) % 2], 2); /*SPR_THANOS[(frame / 3) % 2] alterna entre dois desenhos a cada 3 quadros, dando a animação*/
 
-    /* jogador (pisca quando leva dano) */
-    if (!(j->jog.invul > 0 && (j->frame % 4) < 2)) { /*Invunerável e fase "apagada"*/
+    int dir = PX - 1 - (int)j->th.dist; 
+    telaSprite(t, dir - 13, PES - 17, &SPR_THANOS[(j->frame / 3) % 2], 2); 
+
+
+    if (!(j->jog.invul > 0 && (j->frame % 4) < 2)) { 
         int pose;
-        if (!j->jog.noChao){ /*no ar: pose de pulo*/
+        if (!j->jog.noChao){ 
             pose = 2;
-        } else if (j->jog.agachado > 0){ /*agachado*/
+        } else if (j->jog.agachado > 0){ 
             pose = 3;
-        } else { /*correndo: alterna 0 e 1*/
+        } else { 
             pose = (int)((j->frame / 3) % 2);
         }
         const Sprite *s = &SPR_JOG[j->sexo][pose];
@@ -694,10 +686,10 @@ static void desenharJogo(Jogo *j, const Fase *f){ /*Cenário e personagens*/
     telaDesenhar(t, f->cor);
 }
 
-/*Escrito direto no terminal diferentemente de desenharJogo*/
-static void desenharHud(const Jogo *j, const Fase *f, int idx){ /*Painel de informações (fase, pontos, barra do Thanos, joias)*/
+
+static void desenharHud(const Jogo *j, const Fase *f, int idx){ 
     int pts = pontosTotais(j);
-    int hi; /*Guarda resultado; Maior entre o recordo salvo e os pontos atuais*/
+    int hi; 
     if (j->recorde > pts) {
         hi = j->recorde;
     } else {
@@ -713,78 +705,77 @@ static void desenharHud(const Jogo *j, const Fase *f, int idx){ /*Painel de info
 
     screenGotoxy(5, 2);
     screenSetColor(TXT, FUNDO);
-    printf("FASE %d/%d  ", idx + 1, NUM_FASES); /*Mostra a fase atual*/
+    printf("FASE %d/%d  ", idx + 1, NUM_FASES); 
     screenSetColor(f->cor, FUNDO);
-    printf("%-10s", f->cenario); /*Mostra o nome do cenário na cor da fase*/
+    printf("%-10s", f->cenario); 
     screenSetColor(TXT, FUNDO);
-    printf("   FRAG %02d/%02d", frag, f->meta); /*Mostra os fragmentos coletados*/
+    printf("   FRAG %02d/%02d", frag, f->meta); 
     screenSetColor(SUAVE, FUNDO);
-    printf("      HI %06d", hi); /*Recorde com 6 dígitos*/
+    printf("      HI %06d", hi); 
     screenSetColor(TXT, FUNDO);
-    printf("  %06d  ", pts); /*Mostra os pontos atuais*/
+    printf("  %06d  ", pts); 
 
-    /* Barra de distancia do Thanos */
-    double prop = j->th.dist / f->distIni;  /*Fração que resta entre eu e o Thanos (distância atual / distância inicial)*/
+    
+    double prop = j->th.dist / f->distIni;  
     if (prop < 0) {
         prop = 0;
     }
     if (prop > 1) {
         prop = 1;
     }
-    int cheio = (int)(prop * 20); /*Quantos dos 20 blocos da barra ficam preenchidos*/
+    int cheio = (int)(prop * 20); 
 
     screenGotoxy(5, 22);
     printf("THANOS ");
     if (prop > 0.4){
-        screenSetColor(TXT, FUNDO); /*Barra fica na cor normal*/
+        screenSetColor(TXT, FUNDO); 
     } else {
-        screenSetColor(RED, FUNDO); /*Barra fica vermelha quando Thanos está perto*/
+        screenSetColor(RED, FUNDO); 
     }
 
     for (int i = 0; i < 20; i++) {
         if (i < cheio) {
-            fputs("█", stdout); /*Bloco cheio*/
+            fputs("█", stdout); 
         } else {
-            fputs("░", stdout); /*Bloco vazio, claro*/
-        } /*stdout assumindo a saída padrão na tela e fputs porque não há formatação a fazer*/
+            fputs("░", stdout); 
+        } 
     }
 
     screenSetColor(TXT, FUNDO);
     printf("    JOIAS ");
-    for (int i = 0; i < NUM_FASES; i++) { /*Mostra uma joia por fase*/
+    for (int i = 0; i < NUM_FASES; i++) { 
         if (j->joias[i]) {
             screenSetColor(FASES[i].cor, FUNDO);
-            printf("◆ "); /*Joia coletada*/
+            printf("◆ "); 
         } else {
             screenSetColor(SUAVE, FUNDO);
-            printf("◇ "); /*Joia ainda não coletada*/
+            printf("◇ "); 
         }
     }
 }
 
-/* retorna 1 = venceu a fase, 0 = Thanos alcancou, -1 = saiu */
-static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
+
+static int jogarFase(Jogo *j, int idx){ 
     const Fase *f = &FASES[idx];
-    int resultado = -2, pausado = 0; /*0 = rodando, 1 = pausado*/
+    int resultado = -2, pausado = 0; 
 
     telaIntroFase(f, idx);
 
     listaLiberar(&j->lista);
-    j->jog = (Jogador){ .sexo = j->sexo, .noChao = 1 }; /*jogador é reiniciado*/
-    j->th.dist = f->distIni; /*Thanos começa à distância inicial da fase*/
-    j->fragFase = 0;  /*Nenhum fragmento coletado nesta fase*/
-    j->joiaViva = 0; /*Não há joia em cena (provavelmente uma flag)*/
-    j->proxSpawn = 40; /*Contador até o próximo obstáculo/item aparecer*/
-    j->offChao = 0; /* O chão começa sem deslocamento */
-    j->frame = 0; /* Contador de quadros zerado */
+    j->jog = (Jogador){ .sexo = j->sexo, .noChao = 1 }; 
+    j->th.dist = f->distIni; 
+    j->fragFase = 0;  
+    j->joiaViva = 0; 
+    j->proxSpawn = 40; 
+    j->offChao = 0; 
+    j->frame = 0; 
 
-    limparTela(); /*Apaga o terminal*/
-    limparTeclado(); /*Descarta teclas que tenham sido pressionadas*/
-    timerInit(50);  /* 20 quadros por segundo */
+    limparTela(); 
+    limparTeclado(); 
+    timerInit(50);  
 
     while (resultado == -2) {
         int t;
-        /*Lendo o teclado*/
         while ((t = lerTecla()) != -1) { 
             if (t == 'q' || t == 27 || t == 3) { 
                 resultado = -1;
@@ -797,11 +788,11 @@ static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
                 continue;
             }
 
-            if (t == 'w' || t == ' ' || t == TECLA_CIMA) { /*Pular*/
+            if (t == 'w' || t == ' ' || t == TECLA_CIMA) { 
                 if (j->jog.noChao) { 
                     j->jog.vy = PULO; j->jog.noChao = 0; j->jog.agachado = 0; 
                 }
-            } else if (t == 's' || t == TECLA_BAIXO) { /*Agachar*/
+            } else if (t == 's' || t == TECLA_BAIXO) { 
                 if (j->jog.noChao) {
                     j->jog.agachado = 10;
                 } else {
@@ -809,13 +800,12 @@ static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
                 }
             }
         }
-
-        /* Se o jogador apertou para sair, pula o restante da iteração */
+        
         if (resultado != -2) {
             break;
         }
 
-        /*Cálculo da velocidade*/
+    
         if (timerTimeOver() && !pausado) { 
             int frags;
             if (j->fragFase > f->meta) {
@@ -824,56 +814,52 @@ static int jogarFase(Jogo *j, int idx){ /*idx = número da fase*/
                 frags = j->fragFase;
             }
             double prog = (double)frags / f->meta;
-            double v = f->vel * (1.0 + 0.25 * prog); /* Acelera dentro da fase conforme coleta fragmentos */
+            double v = f->vel * (1.0 + 0.25 * prog); 
 
-            /*Atualizando o jogo e mundo*/
+           
             atualizarJogador(&j->jog);
             if (atualizarMundo(j, f, v)) { 
                 resultado = 1; 
             } else {
-                /*Gerar novos obstáculos*/
-                j->proxSpawn = j->proxSpawn - v; /*Diminui o contador de spawn pela velocidade atual do jogo*/
+                j->proxSpawn = j->proxSpawn - v; 
                 if (j->proxSpawn <= 0) {
                     spawnEvento(j, f);
                     j->proxSpawn = f->gapMin + v * 14 + rnd(f->gapVar);
                 }
 
-                /*Thanos*/
-                j->th.dist += 0.03;  /* Thanos se afasta devagar */
+               
+                j->th.dist += 0.03;  
                 if (j->th.dist > f->distIni) { 
                     j->th.dist = f->distIni; 
-                } /* Thanos não pode se afastar mais que a distância inicial */
+                } 
                 if (j->th.dist <= 0) { 
                     resultado = 0; 
-                } /*Thanos alcançou o jogador*/
+                } 
             }
 
-            /*Avancar o estado e desenhar*/
+            
             if(resultado == -2) {
-                j->offChao += v;  /*O chão anda (usado nas pedrinhas)*/
-                j->metros += v * 0.25;  /*Distância percorrida (conta para a pontuação)*/
-                j->frame++;  /*Próximo quadro (usado nas animações)*/
+                j->offChao += v;  
+                j->metros += v * 0.25;  
+                j->frame++;  
             
 
-                /*Desenhar*/
-                desenharJogo(j, f);  /*Monta o cenário e personagens*/
-                desenharHud(j, f, idx);  /*Escreve o painel*/
-                screenUpdate();  /*Envia tudo ao terminal*/
+                desenharJogo(j, f);  
+                desenharHud(j, f, idx);  
+                screenUpdate();  
             }
         }
         if (resultado == -2) {
-            usleep(2000); /*A cada volta do laço, o programa pausa por 2000 microsegundos; fim do laço*/
+            usleep(2000); 
         }
     }
     listaLiberar(&j->lista);
     return resultado; 
 }
 
-/* ================= FIM DA SECAO 6 ================= */
 
 
-/* ================= SECAO 7 - JOGARPARTIDA E MAIN (todos) ================= */
-
+/* ================= SECAO 7 - JOGARPARTIDA E MAIN ================= */
 // roda as 6 fases em sequencia e chama o fim de jogo
 void jogarPartida(Jogo *j, int sexo)
 {
@@ -910,8 +896,8 @@ void jogarPartida(Jogo *j, int sexo)
 }
 
 #ifndef SEM_MAIN
-int main(void)
-{
+int main(void){
+
     srand((unsigned)time(NULL));
     screenInit(0);
     keyboardInit();
@@ -939,7 +925,6 @@ int main(void)
         }
     }
 
-    // limpeza: sem isso o terminal fica sem eco e sem cursor
     listaLiberar(&j->lista);
     telaLiberar(j->tela);
     free(j);
@@ -950,4 +935,3 @@ int main(void)
     return 0;
 }
 #endif
-/* ================= FIM DA SECAO 7 ================= */
