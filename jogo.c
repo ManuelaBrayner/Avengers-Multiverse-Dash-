@@ -240,7 +240,7 @@ void spritePreview(int x, int y, const Sprite *s, int cor){
 }
 
 
-/* ================= SECAO 3 - MUNDO (Pessoa B) ================= */
+/* ================= SECAO 3 - MUNDO ================= */
 Entidade *entidadeNova(TipoEnt tipo, double x, int alt, int w, int h, int valor, const Sprite *const *sp){
     Entidade *e = xmalloc(sizeof *e);
     e->tipo = tipo; e->x = x; e->alt = alt; e->w = w; e->h = h; e->valor = valor;
@@ -267,11 +267,11 @@ int pontosTotais(const Jogo *j){
 
 int colide(const Jogador *p, const Entidade *e){
     int ini = (int)floor(e->x), fim = ini + e->w - 1;
-    if (e->tipo == OBSTACULO) { ini++; fim--; }          /* hitbox um pouco menor */
-    if (ini > PX + 6 || fim < PX + 2) return 0;          /* horizontal */
+    if (e->tipo == OBSTACULO) { ini++; fim--; }          
+    if (ini > PX + 6 || fim < PX + 2) return 0;         
     int ra = (int)(p->altura + 0.5);
-    int ph = (p->agachado > 0 && p->noChao) ? 7 : 11;    /* altura do jogador */
-    return ra < e->alt + e->h && e->alt < ra + ph;       /* vertical */
+    int ph = (p->agachado > 0 && p->noChao) ? 7 : 11;    
+    return ra < e->alt + e->h && e->alt < ra + ph;       
 }
 
 void criarObstaculo(Jogo *j, const Modelo *m, double x){
