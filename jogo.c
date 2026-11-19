@@ -137,7 +137,7 @@ void esperarEnter(void){
 }
 
 
----
+
 
 Tela *telaCriar(int larg, int alt){
     Tela *t = xmalloc(sizeof(Tela));
@@ -239,6 +239,7 @@ void spritePreview(int x, int y, const Sprite *s, int cor){
         }
     }
 }
+
 
 
 // MUNDO
@@ -452,6 +453,7 @@ void rankingMostrar(const Score *lista, const Score *destaque){
 }
 
 
+
 // MENUS E TELAS 
 void telaRanking(void){
     Score *r = rankingCarregar(ARQ_SCORES);
@@ -622,7 +624,7 @@ void telaComoJogar(void){
 
 
 
-/* =DESENHO E FASE ================= */
+// DESENHO E FASE 
 static void desenharJogo(Jogo *j, const Fase *f){ 
     Tela *t = j->tela;
     telaLimpar(t);
@@ -837,9 +839,8 @@ static int jogarFase(Jogo *j, int idx){
 
 
 
-/* ================= SECAO 7 - JOGARPARTIDA E MAIN ================= */
-void jogarPartida(Jogo *j, int sexo)
-{
+// JOGAR PARTIDA E MAIN 
+void jogarPartida(Jogo *j, int sexo){
     j->sexo = sexo;
     j->metros = 0;
     j->fragTotal = 0;
