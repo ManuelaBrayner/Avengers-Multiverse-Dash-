@@ -314,10 +314,11 @@ void spawnEvento(Jogo *j, const Fase *f){
     }
 }
 
-/* move o mundo e trata colisoes; retorna 1 se pegou a joia */
+
 int atualizarMundo(Jogo *j, const Fase *f, double v){
     int pegouJoia = 0;
-    Entidade **pp = &j->lista;          /* ponteiro para o ponteiro: remove qualquer no */
+    Entidade **pp = &j->lista;          
+    
     while (*pp) {
         Entidade *e = *pp;
         int remover = 0;
