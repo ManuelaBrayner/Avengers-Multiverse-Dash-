@@ -241,8 +241,7 @@ void spritePreview(int x, int y, const Sprite *s, int cor){
 }
 
 
-/* ================= SECAO 3 - MUNDO ================= */
-
+// MUNDO
 Entidade *entidadeNova(TipoEnt tipo, double x, int alt, int w, int h, int valor, const Sprite *const *sp){
     Entidade *e = xmalloc(sizeof *e);
     e->tipo = tipo; e->x = x; e->alt = alt; e->w = w; e->h = h; e->valor = valor;
@@ -360,9 +359,8 @@ void atualizarJogador(Jogador *p){
 
 
 
-/* ================= SECAO 4 - RANKING ================= */
-Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score **novoOut)
-{
+// RANKING 
+Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score **novoOut){
     Score *novo = xmalloc(sizeof(Score));
     snprintf(novo->nome, sizeof novo->nome, "%s", nome);
     novo->pontos = pontos;
@@ -390,8 +388,7 @@ Score *rankingInserir(Score *ini, const char *nome, int pontos, int joias, Score
 }
 
 
-Score *rankingCarregar(const char *arq)
-{
+Score *rankingCarregar(const char *arq){
     FILE *f = fopen(arq, "r");
     if (f == NULL) {
         return NULL;
@@ -410,8 +407,7 @@ Score *rankingCarregar(const char *arq)
 }
  
 
-void rankingSalvar(const Score *lista, const char *arq)
-{
+void rankingSalvar(const Score *lista, const char *arq){
     FILE *f = fopen(arq, "w");
     if (f == NULL) {
         return;
@@ -426,8 +422,7 @@ void rankingSalvar(const Score *lista, const char *arq)
 }
 
 
-void rankingLiberar(Score *lista)
-{
+void rankingLiberar(Score *lista){
     while (lista != NULL) {
         Score *prox = lista->prox;   
         free(lista);
@@ -436,8 +431,7 @@ void rankingLiberar(Score *lista)
 }
 
 
-void rankingMostrar(const Score *lista, const Score *destaque)
-{
+void rankingMostrar(const Score *lista, const Score *destaque){
     centro(4, TXT, "RANKING");
     escrever(22, 6, SUAVE, "POS  NOME           PONTOS  JOIAS");
 
@@ -458,10 +452,8 @@ void rankingMostrar(const Score *lista, const Score *destaque)
 }
 
 
-/* ================= SECAO 5 - MENUS E TELAS ================= */
-
-void telaRanking(void)
-{
+// MENUS E TELAS 
+void telaRanking(void){
     Score *r = rankingCarregar(ARQ_SCORES);
 
     limparTela();
@@ -474,8 +466,7 @@ void telaRanking(void)
 }
 
 
-void lerNome(char *dest, int max, int x, int y)
-{
+void lerNome(char *dest, int max, int x, int y){
     int n = 0;
     dest[0] = '\0';
     limparTeclado();
@@ -509,8 +500,7 @@ void lerNome(char *dest, int max, int x, int y)
 }
  
 
-void telaIntroFase(const Fase *f, int idx)
-{
+void telaIntroFase(const Fase *f, int idx){
     limparTela();
     centro(5, f->cor, "FASE %d  -  %s", idx + 1, f->cenario);
     centro(7, TXT, "%s", f->joia);
@@ -523,8 +513,7 @@ void telaIntroFase(const Fase *f, int idx)
 }
 
 
-void telaJoiaConquistada(const Jogo *j, int idx)
-{
+void telaJoiaConquistada(const Jogo *j, int idx){
     const Fase *f = &FASES[idx];
 
     limparTela();
@@ -537,8 +526,7 @@ void telaJoiaConquistada(const Jogo *j, int idx)
 }
 
 
-void fimDeJogo(Jogo *j)
-{
+void fimDeJogo(Jogo *j){
     int venceu = (j->nJoias == NUM_FASES);   
 
     limparTela();
@@ -572,8 +560,7 @@ void fimDeJogo(Jogo *j)
 }
 
 
-int menuPrincipal(void)
-{
+int menuPrincipal(void){
     limparTela();
     centro(5, TXT, "A V E N G E R S    R U N");
     centro(7, SUAVE, "Fuja de Thanos e reuna as 6 Joias do Infinito");
@@ -594,8 +581,7 @@ int menuPrincipal(void)
 }
 
 
-int escolherPersonagem(void)
-{
+int escolherPersonagem(void){
     limparTela();
     centro(4, TXT, "Escolha seu personagem");
     for (int p = 0; p < 2; p++) {
@@ -617,8 +603,7 @@ int escolherPersonagem(void)
 }
  
 
-void telaComoJogar(void)
-{
+void telaComoJogar(void){
     limparTela();
     centro(3, TXT, "Como jogar");
     escrever(10, 6, TXT, "Fuja de Thanos! Em cada fase (uma Joia do Infinito):");
@@ -637,7 +622,7 @@ void telaComoJogar(void)
 
 
 
-/* ================= SECAO 6 - DESENHO E FASE ================= */
+/* =DESENHO E FASE ================= */
 static void desenharJogo(Jogo *j, const Fase *f){ 
     Tela *t = j->tela;
     telaLimpar(t);
