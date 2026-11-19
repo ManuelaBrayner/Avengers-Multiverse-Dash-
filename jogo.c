@@ -14,9 +14,6 @@
 #include "dados.h"
 
 
-/* ================= SECAO 1 - UTILITARIOS (Pessoa A) ================= */
-
-// pede memoria. se nao tiver, fecha o programa
 void *xmalloc(size_t n){
     void *p = malloc(n);
     if (p == NULL) {
@@ -28,12 +25,11 @@ void *xmalloc(size_t n){
     return p;
 }
 
-// numero aleatorio de 0 ate n-1
 int rnd(int n){
     return rand() % n;
 }
 
-// le uma tecla. devolve -1 se nao tem nenhuma
+
 int lerTeclaBruta(void){
     if (keyhit() == 0) {
         return -1;
@@ -41,7 +37,6 @@ int lerTeclaBruta(void){
 
     int c = readch() & 0xFF;
 
-    // as setas chegam como 3 teclas: 27, '[' e a letra
     if (c == 27) {
         if (keyhit()) {
             int c2 = readch() & 0xFF;
@@ -57,7 +52,7 @@ int lerTeclaBruta(void){
     return c;
 }
 
-// igual a de cima, mas transforma maiuscula em minuscula
+
 int lerTecla(void){
     int c = lerTeclaBruta();
     if (c >= 'A' && c <= 'Z') {
@@ -66,14 +61,14 @@ int lerTecla(void){
     return c;
 }
 
-// joga fora as teclas que estavam esperando
+
 void limparTeclado(void){
     while (keyhit()) {
         readch();
     }
 }
 
-// conta quantas colunas o texto ocupa (letra com acento conta 1)
+
 static int larguraUtf8(const char *s){
     int n = 0;
     int i = 0;
@@ -86,7 +81,7 @@ static int larguraUtf8(const char *s){
     return n;
 }
 
-// escreve texto colorido numa posicao (funciona como printf)
+
 void escrever(int x, int y, int cor, const char *fmt, ...){
     char texto[256];
     va_list args;
@@ -99,7 +94,7 @@ void escrever(int x, int y, int cor, const char *fmt, ...){
     printf("%s", texto);
 }
 
-// escreve texto colorido no meio da linha y
+
 void centro(int y, int cor, const char *fmt, ...){
     char texto[256];
     va_list args;
@@ -117,7 +112,7 @@ void centro(int y, int cor, const char *fmt, ...){
     printf("%s", texto);
 }
 
-// pinta o terminal inteiro com a cor de fundo
+
 void limparTela(void){
     screenSetColor(TXT, FUNDO);
     screenClear();
@@ -129,7 +124,7 @@ void limparTela(void){
     }
 }
 
-// espera apertar Enter ou Espaco
+
 void esperarEnter(void){
     limparTeclado();
     while (1) {
@@ -141,13 +136,8 @@ void esperarEnter(void){
     }
 }
 
-/* ================= FIM DA SECAO 1 ================= */
 
 
-
-/* ================= SECAO 2 - TELA DE PIXELS (Pessoa A) ================= */
-
-// cria a matriz de pixels
 Tela *telaCriar(int larg, int alt){
     Tela *t = xmalloc(sizeof(Tela));
     t->larg = larg;
@@ -160,7 +150,7 @@ Tela *telaCriar(int larg, int alt){
     return t;
 }
 
-// libera na ordem contraria -> linhas, vetor, struct
+
 void telaLiberar(Tela *t){
     if (t == NULL) {
         return;
@@ -172,14 +162,14 @@ void telaLiberar(Tela *t){
     free(t);
 }
 
-// zera todos os pixels
+
 void telaLimpar(Tela *t){
     for (int y = 0; y < t->alt; y++) {
         memset(t->m[y], 0, t->larg);
     }
 }
 
-// liga um pixel (ignora se estiver fora da tela)
+
 void telaPut(Tela *t, int x, int y, int v){
     if (x < 0 || y < 0 || x >= t->larg || y >= t->alt) {
         return;
@@ -187,7 +177,7 @@ void telaPut(Tela *t, int x, int y, int v){
     t->m[y][x] = (unsigned char)v;
 }
 
-// desenha um sprite -> cada # vira um pixel
+
 void telaSprite(Tela *t, int x, int yTopo, const Sprite *s, int v){
     for (int linha = 0; linha < s->h; linha++) {
         for (int coluna = 0; coluna < s->w; coluna++) {
@@ -198,7 +188,7 @@ void telaSprite(Tela *t, int x, int yTopo, const Sprite *s, int v){
     }
 }
 
-// transforma a matriz em caracteres e mostra no terminal
+
 void telaDesenhar(const Tela *t, int corJoia){
     screenSetColor(TXT, FUNDO);
 
@@ -229,7 +219,7 @@ void telaDesenhar(const Tela *t, int corJoia){
     }
 }
 
-// diz se o pixel (x, y) do sprite esta ligado
+
 static int pix(const Sprite *s, int x, int y){
     if (y >= s->h || x >= s->w) {
         return 0;
@@ -237,7 +227,7 @@ static int pix(const Sprite *s, int x, int y){
     return s->r[y][x] == '#';
 }
 
-// mostra um sprite direto no terminal (usado nos menus)
+
 void spritePreview(int x, int y, const Sprite *s, int cor){
     screenSetColor(cor, FUNDO);
     for (int cy = 0; cy < (s->h + 1) / 2; cy++) {
@@ -248,9 +238,6 @@ void spritePreview(int x, int y, const Sprite *s, int cor){
         }
     }
 }
-
-/* ================= FIM DA SECAO 2 ================= */
-
 
 
 /* ================= SECAO 3 - MUNDO (Pessoa B) ================= */
