@@ -137,7 +137,6 @@ Cada célula do terminal mostra **2 pixels na vertical**, usando os caracteres e
  
 - Uma **branch por etapa**, nunca commit direto na `main`.
 - Cada pessoa escreve **só na sua seção** do `jogo.c`.
-- Pull request revisado por uma colega antes do merge.
 - Antes de começar: `git pull`. Antes de enviar: compilar e testar.
 ## Testes
  
