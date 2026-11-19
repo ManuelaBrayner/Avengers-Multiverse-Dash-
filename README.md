@@ -16,6 +16,9 @@ Projeto em **C** com a biblioteca **cli-lib**, feito em equipe para a disciplina
 | D – Manuela Brayner | Ranking, menus e documentação (seções 4 e 5, README) |
 | Todos | Integração (seção 7: `jogarPartida` e `main`), balanceamento e testes |
 
+## Vídeo do jogo sendo executado
+link: https://youtu.be/fWvKR1x_70o
+
  
 ## Como o jogo funciona
  
