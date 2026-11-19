@@ -648,6 +648,7 @@ static void desenharJogo(Jogo *j, const Fase *f){
     telaLimpar(t);
 
     int valor_oh = (int)j->offChao; 
+
     for (int i = 0; i < LARG; i++) { 
         if (((unsigned int)(valor_oh + i) * 2654435761u >> 16) % 23 == 0){ 
             telaPut(t, i, GL + 2, 2);
@@ -655,6 +656,7 @@ static void desenharJogo(Jogo *j, const Fase *f){
     }
 
     int quadro = (int)((j->frame / 4) % 2); 
+
     for (const Entidade *e = j->lista; e; e = e->prox) {
         const Sprite *s; 
         if (e->spr[1] && quadro){
@@ -663,7 +665,6 @@ static void desenharJogo(Jogo *j, const Fase *f){
             s = e->spr[0]; 
         }
         telaSprite(t, (int)floor(e->x), PES - e->alt - (s->h - 1), s, e->valor);
-        /*PES é o nível do chão*/
     }
 
 
@@ -690,6 +691,7 @@ static void desenharJogo(Jogo *j, const Fase *f){
 static void desenharHud(const Jogo *j, const Fase *f, int idx){ 
     int pts = pontosTotais(j);
     int hi; 
+
     if (j->recorde > pts) {
         hi = j->recorde;
     } else {
